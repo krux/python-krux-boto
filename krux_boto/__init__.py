@@ -133,9 +133,9 @@ class Boto(object):
 
 class Application(krux.cli.Application):
 
-    def __init__(self):
+    def __init__(self, name = NAME):
         ### Call to the superclass to bootstrap.
-        super(Application, self).__init__(name = NAME)
+        super(Application, self).__init__(name = name)
 
         self.boto = Boto(
             parser = self.parser,
