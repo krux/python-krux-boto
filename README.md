@@ -53,7 +53,13 @@ class MyApplication( krux.cli.Application ):
 
     def __init__(self, *args, **kwargs):
         ### Call to the superclass to bootstrap.
-        super(Application, self).__init__(name = 'my-application')
+        super(MyApplication, self).__init__(name = 'my-application')
+
+        self.boto = Boto(
+            parser = self.parser,
+            logger = self.logger,
+            stats  = self.stats,
+        )
 
     def add_cli_arguments(self, parser):
 
