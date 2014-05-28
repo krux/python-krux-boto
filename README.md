@@ -23,12 +23,18 @@ def main():
     ### boto object, but with the right logging/stats settings added.
     boto = app.boto
 
+    ### This gets you a region object based on the preference of
+    ### the CLI parameters passed:
+    region = boto.ec2.get_region(app.boto.cli_region)
+
     ### Sample program: connect to ec2 and list the regions:
-    ec2 = boto.connect_ec2()
+    ec2 = app.boto.connect_ec2(region = region)
+
+    ### Some simple diagnostics to show that it works
+    app.logger.warn('Connected to region: %s', region.name)
 
     for r in ec2.get_all_regions():
         app.logger.warn('Region: %s', r.name)
-
 
 ### Run the application stand alone
 if __name__ == '__main__':
@@ -85,6 +91,7 @@ usage: krux-boto-test [-h] [--log-level {info,debug,critical,warning,error}]
                       [--boto-log-level {info,debug,critical,warning,error}]
                       [--boto-access-key BOTO_ACCESS_KEY]
                       [--boto-secret-key BOTO_SECRET_KEY]
+                      [--boto-region {us-east-1,cn-north-1,ap-northeast-1,eu-west-1,ap-southeast-1,ap-southeast-2,us-west-2,us-gov-west-1,us-west-1,sa-east-1}]
 
 krux-boto
 
@@ -114,4 +121,6 @@ boto:
   --boto-secret-key BOTO_SECRET_KEY
                         AWS Secret Key to use. Defaults to
                         ENV[AWS_SECRET_ACCESS_KEY]
+  --boto-region {us-east-1,cn-north-1,ap-northeast-1,eu-west-1,ap-southeast-1,ap-southeast-2,us-west-2,us-gov-west-1,us-west-1,sa-east-1}
+                        EC2 Region to connect to. (default: us-east-1)
 ```
