@@ -14,6 +14,7 @@ import os
 ### The boto library
 import boto
 import boto.ec2
+import boto.utils
 
 from boto.ec2 import get_region
 
@@ -32,6 +33,20 @@ ACCESS_KEY      = 'AWS_ACCESS_KEY_ID'
 SECRET_KEY      = 'AWS_SECRET_ACCESS_KEY'
 NAME            = 'krux-boto'
 DEFAULT_REGION  = 'us-east-1'
+
+
+def get_instance_region():
+    """
+    Query the instance metadata service and return the region this instance is
+    placed in. If the metadata service can't be contacted, return a generic
+    default instead.
+    """
+    ### TODO: XXX This shouldn't get called if we're not on EC2.
+    zone = boto.utils.get_instance_metadata()['placement']['availability-zone']
+    if zone is None:
+        return 'us-east-1'
+    return zone.rstrip(string.lowercase)
+
 
 ### Designed to be called from krux.cli, or programs inheriting from it
 def add_boto_cli_arguments(parser):
@@ -175,7 +190,7 @@ class Application(krux.cli.Application):
 
 def main():
     app    = Application()
-    region = boto.ec2.get_region(app.boto.cli_region)
+    region = get_region(app.boto.cli_region)
     ec2    = app.boto.connect_ec2(region = region)
 
     app.logger.warn('Connected to region: %s', region.name)
