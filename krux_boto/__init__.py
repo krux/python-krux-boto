@@ -66,7 +66,7 @@ def add_boto_cli_arguments(parser):
 
 
 class Boto(object):
-    def __init__(self, logger = None, stats = None, parser = None):
+    def __init__(self, logger = None, stats = None, parser = None, cli_args = None):
 
 
         ### Because we're wrapping boto directly, use ___ as a prefix for
@@ -77,7 +77,7 @@ class Boto(object):
         self.___parser = parser or get_parser(description = self.___name)
 
         ### in case we got some of the information via the CLI
-        self.___args    = self.___parser.parse_args()
+        self.___args    = self.___parser.parse_args(args = cli_args)
 
         ### this has to be 'public', so callers can use it. It's unfortunately
         ### near impossible to transparently wrap this, because the boto.config
@@ -157,14 +157,18 @@ class Boto(object):
 
 class Application(krux.cli.Application):
 
-    def __init__(self, name = NAME):
+    def __init__(self, name = NAME, cli_args = None):
         ### Call to the superclass to bootstrap.
-        super(Application, self).__init__(name = name)
+        super(Application, self).__init__(name = name, cli_args = cli_args)
 
+
+        # if cli_args = None the list of args from sys.argv will be used,
+        # and if its '', no any args will be used.
         self.boto = Boto(
-            parser = self.parser,
-            logger = self.logger,
-            stats  = self.stats,
+            parser   = self.parser,
+            logger   = self.logger,
+            stats    = self.stats,
+            cli_args = cli_args,
         )
 
     def add_cli_arguments(self, parser):
