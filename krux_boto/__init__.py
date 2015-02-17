@@ -16,8 +16,6 @@ import boto
 import boto.ec2
 import boto.utils
 
-from boto.ec2 import get_region
-
 
 ### for the application class
 import krux.cli
@@ -42,8 +40,9 @@ def get_instance_region():
     default instead.
     """
     ### TODO: XXX This shouldn't get called if we're not on EC2.
-    zone = boto.utils.get_instance_metadata()['placement']['availability-zone']
+    zone = boto.utils.get_instance_metadata().get('placement', {}).get('availability-zone', None)
     if zone is None:
+        krux.logging.get_logger('krux_boto').warn('get_instance_region failed to get the local instance region')
         return 'us-east-1'
     return zone.rstrip(string.lowercase)
 
@@ -190,7 +189,7 @@ class Application(krux.cli.Application):
 
 def main():
     app    = Application()
-    region = get_region(app.boto.cli_region)
+    region = boto.ec2.get_region(app.boto.cli_region)
     ec2    = app.boto.connect_ec2(region = region)
 
     app.logger.warn('Connected to region: %s', region.name)
