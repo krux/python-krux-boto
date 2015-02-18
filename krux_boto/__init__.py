@@ -15,6 +15,9 @@ import os
 import boto
 import boto.ec2
 import boto.utils
+### This is still here in case something else is using it via an import.
+### This should be removed.
+from boto.ec2 import get_region
 
 
 ### for the application class
@@ -33,6 +36,10 @@ NAME            = 'krux-boto'
 DEFAULT_REGION  = 'us-east-1'
 
 
+class Error(Exception):
+    pass
+
+
 def get_instance_region():
     """
     Query the instance metadata service and return the region this instance is
@@ -43,7 +50,7 @@ def get_instance_region():
     zone = boto.utils.get_instance_metadata().get('placement', {}).get('availability-zone', None)
     if zone is None:
         krux.logging.get_logger('krux_boto').warn('get_instance_region failed to get the local instance region')
-        return 'us-east-1'
+        raise Error('get_instance_region failed to get the local instance region')
     return zone.rstrip(string.lowercase)
 
 
