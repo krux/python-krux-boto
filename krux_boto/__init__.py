@@ -14,7 +14,9 @@ import os
 ### The boto library
 import boto
 import boto.ec2
-
+import boto.utils
+### This is still here in case something else is using it via an import.
+### This should be removed.
 from boto.ec2 import get_region
 
 
@@ -32,6 +34,25 @@ ACCESS_KEY      = 'AWS_ACCESS_KEY_ID'
 SECRET_KEY      = 'AWS_SECRET_ACCESS_KEY'
 NAME            = 'krux-boto'
 DEFAULT_REGION  = 'us-east-1'
+
+
+class Error(Exception):
+    pass
+
+
+def get_instance_region():
+    """
+    Query the instance metadata service and return the region this instance is
+    placed in. If the metadata service can't be contacted, return a generic
+    default instead.
+    """
+    ### TODO: XXX This shouldn't get called if we're not on EC2.
+    zone = boto.utils.get_instance_metadata().get('placement', {}).get('availability-zone', None)
+    if zone is None:
+        krux.logging.get_logger('krux_boto').warn('get_instance_region failed to get the local instance region')
+        raise Error('get_instance_region failed to get the local instance region')
+    return zone.rstrip(string.lowercase)
+
 
 ### Designed to be called from krux.cli, or programs inheriting from it
 def add_boto_cli_arguments(parser):

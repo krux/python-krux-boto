@@ -1,4 +1,4 @@
-python-krux-scheduler
+python-krux-boto
 =====================
 
 Krux Python class built on top of [Krux Stdlib](https://staticfiles.krxd.net/foss/docs/pypi/krux-stdlib/) for interacting with [Boto](http://boto.readthedocs.org/en/latest/)
