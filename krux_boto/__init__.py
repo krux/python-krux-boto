@@ -21,17 +21,17 @@ from boto.ec2 import get_region
 ### for the application class
 import krux.cli
 
-from krux.constants     import DEFAULT_LOG_LEVEL
 from krux.logging       import get_logger, LEVELS
 from krux.stats         import get_stats
 from krux.cli           import get_parser, get_group
-
 
 ### Constants
 ACCESS_KEY      = 'AWS_ACCESS_KEY_ID'
 SECRET_KEY      = 'AWS_SECRET_ACCESS_KEY'
 NAME            = 'krux-boto'
 DEFAULT_REGION  = 'us-east-1'
+DEFAULT_LOG_LEVEL = 'warning'
+
 
 ### Designed to be called from krux.cli, or programs inheriting from it
 def add_boto_cli_arguments(parser):
@@ -67,7 +67,6 @@ def add_boto_cli_arguments(parser):
 
 class Boto(object):
     def __init__(self, logger = None, stats = None, parser = None):
-
 
         ### Because we're wrapping boto directly, use ___ as a prefix for
         ### all our variables, so we don't clash with anything public
