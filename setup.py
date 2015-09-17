@@ -11,8 +11,6 @@ Package setup for krux-boto
 from __future__ import absolute_import
 from setuptools import setup, find_packages
 
-import os
-
 # We use the version to construct the DOWNLOAD_URL.
 VERSION      = '0.0.7'
 
