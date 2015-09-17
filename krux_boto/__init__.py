@@ -23,7 +23,7 @@ from boto.ec2 import get_region
 ### for the application class
 import krux.cli
 
-from krux.logging       import get_logger, LEVELS
+from krux.logging       import get_logger, LEVELS, DEFAULT_LOG_LEVEL
 from krux.stats         import get_stats
 from krux.cli           import get_parser, get_group
 
@@ -32,8 +32,6 @@ ACCESS_KEY      = 'AWS_ACCESS_KEY_ID'
 SECRET_KEY      = 'AWS_SECRET_ACCESS_KEY'
 NAME            = 'krux-boto'
 DEFAULT_REGION  = 'us-east-1'
-DEFAULT_LOG_LEVEL = 'warning'
-
 
 
 class Error(Exception):
