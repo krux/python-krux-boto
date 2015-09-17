@@ -112,12 +112,12 @@ class Boto(object):
         ### if these are set, make sure we set the environment again
         ### as well; that way the underlying boto calls will just DTRT
         ### without the need to wrap all the functions.
-        map = {
+        credential_map = {
             'boto_access_key': ACCESS_KEY,
             'boto_secret_key': SECRET_KEY,
         }
 
-        for name, env_var in map.iteritems():
+        for name, env_var in credential_map.iteritems():
             val = getattr( self.___args, name, None )
 
             if val is not None:
