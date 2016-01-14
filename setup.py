@@ -37,7 +37,7 @@ setup(
     ],
     entry_points     = {
         'console_scripts': [
-            'krux-boto-test = krux_boto:main',
+            'krux-boto-test = krux_boto.cli:main',
         ],
     },
 )
