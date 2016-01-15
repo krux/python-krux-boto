@@ -29,37 +29,21 @@ from krux_boto import Boto, add_boto_cli_arguments
 
 class BotoTest(unittest.TestCase):
 
-    parser_patcher = None
-
-    def _setup_parser(self, args=[]):
+    def _get_parser(self, args=[]):
         # Get the argparse namespace object with the given args
         parser = krux.cli.get_parser()
         add_boto_cli_arguments(parser)
         namespace = parser.parse_args(args)
 
-        # If there is an existing patch, close it
-        if self.parser_patcher is not None:
-            self.parser_patcher.stop()
-            self.parser_patcher = None
-
-        # Patch the krux_boto.boto.get_parser function to return an ArgumentParser always
-        # GOTCHA: Because get_parser is globally imported into krux_boto.boto, this is the path
-        self.parser_patcher = patch(
-            target='krux_boto.boto.get_parser',
+        # Return a mock ArgumentParser object as a parser
+        # It has a function called 'parse_args' with the return value is the namespace variable defined above
+        return MagicMock(
             spec=ArgumentParser,
-            # The return value of the get_parser function has a function called 'parse_args'
-            # The return value of the parse_args is the namespace variable defined above
-            return_value=MagicMock(parse_args=MagicMock(return_value=namespace))
+            parse_args=MagicMock(return_value=namespace)
         )
-        mock_parser = self.parser_patcher.start()
 
     def setUp(self):
-        parser = self._setup_parser()
-        self.boto = Boto(parser=parser)
-
-    def tearDown(self):
-        self.parser_patcher.stop()
-        self.parser_patcher = None
+        self.boto = Boto(parser=self._get_parser())
 
     def test_get_region(self):
         self.assertIsNotNone(self.boto.cli_region)
