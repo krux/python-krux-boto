@@ -45,5 +45,8 @@ class BotoTest(unittest.TestCase):
     def setUp(self):
         self.boto = Boto(parser=self._get_parser())
 
-    def test_get_region(self):
-        self.assertIsNotNone(self.boto.cli_region)
+    def test_cli_region(self):
+        region = 'us-west-2'
+        self.boto = Boto(parser=self._get_parser(['--boto-region', region]))
+
+        self.assertEqual(region, self.boto.cli_region)
