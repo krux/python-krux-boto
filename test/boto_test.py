@@ -47,12 +47,11 @@ class BotoTest(unittest.TestCase):
         self.parser_patcher = patch(
             target='krux_boto.boto.get_parser',
             spec=ArgumentParser,
+            # The return value of the get_parser function has a function called 'parse_args'
+            # The return value of the parse_args is the namespace variable defined above
+            return_value=MagicMock(parse_args=MagicMock(return_value=namespace))
         )
         mock_parser = self.parser_patcher.start()
-
-        # The return value of the get_parser function has a function called 'parse_args'
-        # The return value of the parse_args is the namespace variable defined above
-        mock_parser.return_value.parse_args.return_value = namespace
 
     def setUp(self):
         parser = self._setup_parser()
