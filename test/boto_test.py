@@ -9,6 +9,8 @@
 
 from __future__ import absolute_import
 import unittest
+import os
+from logging import Logger
 
 #
 # Third party libraries
@@ -24,7 +26,8 @@ from mock import MagicMock, patch
 
 import krux.cli
 import krux.logging
-from krux_boto import Boto, add_boto_cli_arguments
+import krux_boto.boto
+from krux_boto.boto import Boto, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY
 
 
 class BotoTest(unittest.TestCase):
@@ -50,3 +53,62 @@ class BotoTest(unittest.TestCase):
         self.boto = Boto(parser=self._get_parser(['--boto-region', region]))
 
         self.assertEqual(region, self.boto.cli_region)
+
+    def test_credential_logging_success(self):
+        mock_logger = MagicMock(spec=Logger, autospec=True)
+
+        credential_map = {
+            ACCESS_KEY: os.environ.get(ACCESS_KEY),
+            SECRET_KEY: os.environ.get(SECRET_KEY),
+        }
+
+        with patch.dict('krux_boto.boto.os.environ', {}):
+            self.boto = Boto(
+                logger=mock_logger,
+                parser=self._get_parser([
+                    '--boto-access-key', credential_map[ACCESS_KEY],
+                    '--boto-secret-key', credential_map[SECRET_KEY],
+                ]),
+            )
+
+            self.assertIn(ACCESS_KEY, krux_boto.boto.os.environ)
+            self.assertEqual(credential_map[ACCESS_KEY], krux_boto.boto.os.environ[ACCESS_KEY])
+            self.assertIn(SECRET_KEY, krux_boto.boto.os.environ)
+            self.assertEqual(credential_map[SECRET_KEY], krux_boto.boto.os.environ[SECRET_KEY])
+
+        for key, val in credential_map.iteritems():
+            obsc = val[0:3] + '[...]' + val[-3:]
+            mock_logger.debug.assert_any_call('Setting boto credential %s to %s', key, obsc)
+            mock_logger.info.assert_not_called(
+                'Boto environment credential %s NOT explicitly set -- boto will look for a .boto file somewhere',
+                key,
+            )
+
+    def test_credential_logging_empty(self):
+        mock_logger = MagicMock(spec=Logger, autospec=True)
+
+        credential_map = {
+            ACCESS_KEY: '',
+            SECRET_KEY: '',
+        }
+
+        with patch.dict('krux_boto.boto.os.environ', {}):
+            self.boto = Boto(
+                logger=mock_logger,
+                parser=self._get_parser([
+                    '--boto-access-key', credential_map[ACCESS_KEY],
+                    '--boto-secret-key', credential_map[SECRET_KEY],
+                ]),
+            )
+
+            self.assertIn(ACCESS_KEY, krux_boto.boto.os.environ)
+            self.assertEqual(credential_map[ACCESS_KEY], krux_boto.boto.os.environ[ACCESS_KEY])
+            self.assertIn(SECRET_KEY, krux_boto.boto.os.environ)
+            self.assertEqual(credential_map[SECRET_KEY], krux_boto.boto.os.environ[SECRET_KEY])
+
+        for key, val in credential_map.iteritems():
+            mock_logger.debug.assert_any_call('Setting boto credential %s to %s', key, '<empty>')
+            mock_logger.info.assert_any_call(
+                'Boto environment credential %s NOT explicitly set -- boto will look for a .boto file somewhere',
+                key,
+            )
