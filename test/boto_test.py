@@ -45,9 +45,6 @@ class BotoTest(unittest.TestCase):
             parse_args=MagicMock(return_value=namespace)
         )
 
-    def setUp(self):
-        self.boto = Boto(parser=self._get_parser())
-
     def test_cli_region(self):
         region = 'us-west-2'
         self.boto = Boto(parser=self._get_parser(['--boto-region', region]))
