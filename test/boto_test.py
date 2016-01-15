@@ -10,7 +10,7 @@
 from __future__ import absolute_import
 import unittest
 import os
-from logging import Logger
+from logging import Logger, INFO
 
 #
 # Third party libraries
@@ -25,8 +25,8 @@ from mock import MagicMock, patch
 #
 
 import krux.cli
-import krux.logging
 import krux_boto.boto
+from krux.logging import get_logger
 from krux_boto.boto import Boto, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY
 
 
@@ -112,3 +112,10 @@ class BotoTest(unittest.TestCase):
                 'Boto environment credential %s NOT explicitly set -- boto will look for a .boto file somewhere',
                 key,
             )
+
+    def test_logging_level(self):
+        self.boto = Boto(
+            parser=self._get_parser(['--boto-log-level', 'info'])
+        )
+
+        self.assertEqual(INFO, get_logger('boto').getEffectiveLevel())
