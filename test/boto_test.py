@@ -42,12 +42,14 @@ class BotoTest(unittest.TestCase):
         # It has a function called 'parse_args' with the return value is the namespace variable defined above
         return MagicMock(
             spec=ArgumentParser,
-            parse_args=MagicMock(return_value=namespace)
+            parse_args=MagicMock(return_value=namespace),
         )
 
     def test_cli_region(self):
         region = 'us-west-2'
-        self.boto = Boto(parser=self._get_parser(['--boto-region', region]))
+        self.boto = Boto(
+            parser=self._get_parser(['--boto-region', region]),
+        )
 
         self.assertEqual(region, self.boto.cli_region)
 
@@ -112,7 +114,35 @@ class BotoTest(unittest.TestCase):
 
     def test_logging_level(self):
         self.boto = Boto(
-            parser=self._get_parser(['--boto-log-level', 'info'])
+            parser=self._get_parser(['--boto-log-level', 'info']),
         )
 
         self.assertEqual(INFO, get_logger('boto').getEffectiveLevel())
+
+    def test_get_attr_property(self):
+        mock_logger = MagicMock(spec=Logger, autospec=True)
+
+        self.boto = Boto(
+            logger=mock_logger,
+            parser=self._get_parser(),
+        )
+
+        mock_logger.debug.reset_mock()
+
+        self.assertEqual(boto.ec2, self.boto.ec2)
+
+        mock_logger.debug.assert_called_once_with('Calling wrapped boto attribute: %s', 'ec2')
+        mock_logger.debug.assert_not_called("Boto attribute '%s' is callable", 'connect_ec2')
+
+    def test_get_attr_function(self):
+        mock_logger = MagicMock(spec=Logger, autospec=True)
+
+        self.boto = Boto(
+            logger=mock_logger,
+            parser=self._get_parser(),
+        )
+
+        self.assertIsInstance(self.boto.connect_ec2(), boto.ec2.EC2Connection)
+
+        mock_logger.debug.assert_any_call('Calling wrapped boto attribute: %s', 'connect_ec2')
+        mock_logger.debug.assert_any_call("Boto attribute '%s' is callable", boto.connect_ec2)
