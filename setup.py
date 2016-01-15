@@ -40,4 +40,5 @@ setup(
             'krux-boto-test = krux_boto.cli:main',
         ],
     },
+    test_suite       = 'test',
 )
