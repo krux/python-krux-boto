@@ -24,8 +24,8 @@ from mock import MagicMock, patch
 # Internal libraries
 #
 
-import krux.cli
 import krux_boto.boto
+from krux.cli import get_parser
 from krux.logging import get_logger
 from krux_boto.boto import Boto, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY
 
@@ -34,7 +34,7 @@ class BotoTest(unittest.TestCase):
 
     def _get_parser(self, args=[]):
         # Get the argparse namespace object with the given args
-        parser = krux.cli.get_parser()
+        parser = get_parser()
         add_boto_cli_arguments(parser)
         namespace = parser.parse_args(args)
 
