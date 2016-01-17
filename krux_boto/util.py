@@ -8,6 +8,7 @@
 #
 
 from __future__ import absolute_import
+import string
 
 #
 # Third party libraries
@@ -35,6 +36,6 @@ def get_instance_region():
     ### TODO: XXX This shouldn't get called if we're not on EC2.
     zone = boto.utils.get_instance_metadata().get('placement', {}).get('availability-zone', None)
     if zone is None:
-        krux.logging.get_logger('krux_boto').warn('get_instance_region failed to get the local instance region')
+        get_logger('krux_boto').warn('get_instance_region failed to get the local instance region')
         raise Error('get_instance_region failed to get the local instance region')
     return zone.rstrip(string.lowercase)
