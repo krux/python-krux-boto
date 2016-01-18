@@ -64,8 +64,8 @@ class BotoTest(unittest.TestCase):
         mock_logger = MagicMock(spec=Logger, autospec=True)
 
         credential_map = {
-            ACCESS_KEY: os.environ.get(ACCESS_KEY),
-            SECRET_KEY: os.environ.get(SECRET_KEY),
+            ACCESS_KEY: 'ABCDEFGHI',
+            SECRET_KEY: '1A2B3C4D5E6F7G8H9I0',
         }
 
         # Mocking the os.environ dictionary as an empty dictionary
