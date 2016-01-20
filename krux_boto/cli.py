@@ -22,34 +22,38 @@ import boto
 import krux.cli
 from krux_boto.boto import Boto, add_boto_cli_arguments, NAME
 
+
 class Application(krux.cli.Application):
 
-    def __init__(self, name = NAME):
-        ### Call to the superclass to bootstrap.
-        super(Application, self).__init__(name = name)
+    def __init__(self, name=NAME):
+        # Call to the superclass to bootstrap.
+        super(Application, self).__init__(name=name)
 
         self.boto = Boto(
-            parser = self.parser,
-            logger = self.logger,
-            stats  = self.stats,
+            parser=self.parser,
+            logger=self.logger,
+            stats=self.stats,
         )
 
     def add_cli_arguments(self, parser):
-
-        ### add the arguments for boto
+        # add the arguments for boto
         add_boto_cli_arguments(parser)
+
+    def run(self):
+        region = self.boto.ec2.get_region(self.boto.cli_region)
+        ec2 = self.boto.connect_ec2(region=region)
+
+        self.logger.warn('Connected to region: %s', region.name)
+        for r in ec2.get_all_regions():
+            self.logger.warn('Region: %s', r.name)
 
 
 def main():
-    app    = Application()
-    region = boto.ec2.get_region(app.boto.cli_region)
-    ec2    = app.boto.connect_ec2(region = region)
-
-    app.logger.warn('Connected to region: %s', region.name)
-    for r in ec2.get_all_regions():
-        app.logger.warn('Region: %s', r.name)
+    app = Application()
+    with app.context():
+        app.run()
 
 
-### Run the application stand alone
+# Run the application stand alone
 if __name__ == '__main__':
     main()
