@@ -25,8 +25,8 @@ from mock import MagicMock, patch
 #
 
 import krux_boto.boto
-from krux.cli import get_parser
-from krux.logging import get_logger
+import krux.cli
+import krux.logging
 from krux_boto.boto import Boto, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY
 
 
@@ -34,7 +34,7 @@ class BotoTest(unittest.TestCase):
 
     def _get_parser(self, args=[]):
         # Get the argparse namespace object with the given args
-        parser = get_parser()
+        parser = krux.cli.get_parser()
         add_boto_cli_arguments(parser)
         namespace = parser.parse_args(args)
 
@@ -137,7 +137,7 @@ class BotoTest(unittest.TestCase):
             parser=self._get_parser(['--boto-log-level', 'info']),
         )
 
-        self.assertEqual(INFO, get_logger('boto').getEffectiveLevel())
+        self.assertEqual(INFO, krux.logging.get_logger('boto').getEffectiveLevel())
 
     def test_get_attr_property(self):
         """
