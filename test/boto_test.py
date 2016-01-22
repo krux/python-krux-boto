@@ -24,9 +24,9 @@ from mock import MagicMock, patch
 # Internal libraries
 #
 
-import krux.cli
 import krux_boto.boto
-from krux.logging import get_logger
+import krux.cli
+import krux.logging
 from krux_boto.boto import Boto, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY
 
 
@@ -137,7 +137,7 @@ class BotoTest(unittest.TestCase):
             parser=self._get_parser(['--boto-log-level', 'info']),
         )
 
-        self.assertEqual(INFO, get_logger('boto').getEffectiveLevel())
+        self.assertEqual(INFO, krux.logging.get_logger('boto').getEffectiveLevel())
 
     def test_get_attr_property(self):
         """
