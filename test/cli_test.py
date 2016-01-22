@@ -23,14 +23,12 @@ from mock import MagicMock, patch
 # Internal libraries
 #
 
-from krux.cli import get_parser
-from krux.logging import get_logger
-from krux.stats import get_stats, DummyStatsClient
+from krux.stats import DummyStatsClient
 from krux_boto.boto import Boto, add_boto_cli_arguments, NAME
 from krux_boto.cli import Application, main
 
 
-class CliTest(unittest.TestCase):
+class CLItest(unittest.TestCase):
 
     def test_init(self):
         """

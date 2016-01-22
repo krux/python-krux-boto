@@ -34,7 +34,7 @@ class UtilTest(unittest.TestCase):
         # Mocking the logger to check for calls later
         mock_logger = MagicMock(spec=Logger, autospec=True)
         # Mocking the metadata returned by boto
-        mockock_metadata = {
+        mock_metadata = {
             'placement': {
                 'availability-zone': 'us-east-1a',
             },
@@ -43,7 +43,7 @@ class UtilTest(unittest.TestCase):
         # get_logger function returns the mocked logger
         with patch('krux_boto.util.get_logger', return_value=mock_logger):
             # get_instance_metadata returns a mock dictionary created above
-            with patch('krux_boto.util.boto.utils.get_instance_metadata', return_value=mockock_metadata):
+            with patch('krux_boto.util.boto.utils.get_instance_metadata', return_value=mock_metadata):
                 self.assertEquals('us-east-1', get_instance_region())
 
         # Verify no warning is thrown
@@ -56,12 +56,12 @@ class UtilTest(unittest.TestCase):
         # Mocking the logger to check for calls later
         mock_logger = MagicMock(spec=Logger, autospec=True)
         # Mocking the metadata returned by boto
-        mockock_metadata = {}
+        mock_metadata = {}
 
         # get_logger function returns the mocked logger
         with patch('krux_boto.util.get_logger', return_value=mock_logger):
             # get_instance_metadata returns a mock dictionary created above
-            with patch('krux_boto.util.boto.utils.get_instance_metadata', return_value=mockock_metadata):
+            with patch('krux_boto.util.boto.utils.get_instance_metadata', return_value=mock_metadata):
                 # Verify an error is thrown
                 with self.assertRaises(Error):
                     get_instance_region()
