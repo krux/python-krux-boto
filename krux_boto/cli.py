@@ -30,7 +30,10 @@ class Application(krux.cli.Application):
         super(Application, self).__init__(name=name)
 
         self.boto = Boto(
-            parser=self.parser,
+            log_level=self.args.boto_log_level,
+            access_key=self.args.boto_access_key,
+            secret_key=self.args.boto_secret_key,
+            region=self.args.boto_region,
             logger=self.logger,
             stats=self.stats,
         )

@@ -32,26 +32,13 @@ from krux_boto.boto import Boto, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY
 
 class BotoTest(unittest.TestCase):
 
-    def _get_parser(self, args=[]):
-        # Get the argparse namespace object with the given args
-        parser = krux.cli.get_parser()
-        add_boto_cli_arguments(parser)
-        namespace = parser.parse_args(args)
-
-        # Return a mock ArgumentParser object as a parser
-        # It has a function called 'parse_args' with the return value is the namespace variable defined above
-        return MagicMock(
-            spec=ArgumentParser,
-            parse_args=MagicMock(return_value=namespace),
-        )
-
     def test_cli_region(self):
         """
         --boto-region arguments sets boto.cli_region variable correctly
         """
         region = 'us-west-2'
         self.boto = Boto(
-            parser=self._get_parser(['--boto-region', region]),
+            region=region,
         )
 
         self.assertEqual(region, self.boto.cli_region)
@@ -69,13 +56,11 @@ class BotoTest(unittest.TestCase):
         }
 
         # Mocking the os.environ dictionary as an empty dictionary
-        with patch.dict('krux_boto.boto.os.environ', {}):
+        with patch.dict('krux_boto.boto.os.environ', clear=True):
             self.boto = Boto(
+                access_key=credential_map[ACCESS_KEY],
+                secret_key=credential_map[SECRET_KEY],
                 logger=mock_logger,
-                parser=self._get_parser([
-                    '--boto-access-key', credential_map[ACCESS_KEY],
-                    '--boto-secret-key', credential_map[SECRET_KEY],
-                ]),
             )
 
             # Check the passed boto credentials are correctly set in the mocked os.environ dictionary
@@ -86,6 +71,10 @@ class BotoTest(unittest.TestCase):
 
         # Verify logging
         for key, val in credential_map.iteritems():
+            mock_logger.debug.assert_not_called(
+                'Passed boto credentials is empty. Falling back to environment variable %s',
+                key,
+            )
             obsc = val[0:3] + '[...]' + val[-3:]
             mock_logger.debug.assert_any_call('Setting boto credential %s to %s', key, obsc)
             mock_logger.info.assert_not_called(
@@ -101,29 +90,28 @@ class BotoTest(unittest.TestCase):
         mock_logger = MagicMock(spec=Logger, autospec=True)
 
         credential_map = {
-            ACCESS_KEY: '',
-            SECRET_KEY: '',
+            ACCESS_KEY: None,
+            SECRET_KEY: None,
         }
 
         # Mocking the os.environ dictionary as an empty dictionary
-        with patch.dict('krux_boto.boto.os.environ', {}):
+        with patch.dict('krux_boto.boto.os.environ', clear=True):
+            print krux_boto.boto.os.environ
             self.boto = Boto(
+                access_key=credential_map[ACCESS_KEY],
+                secret_key=credential_map[SECRET_KEY],
                 logger=mock_logger,
-                parser=self._get_parser([
-                    '--boto-access-key', credential_map[ACCESS_KEY],
-                    '--boto-secret-key', credential_map[SECRET_KEY],
-                ]),
             )
 
             # Check the passed boto credentials are correctly set in the mocked os.environ dictionary
-            self.assertIn(ACCESS_KEY, krux_boto.boto.os.environ)
-            self.assertEqual(credential_map[ACCESS_KEY], krux_boto.boto.os.environ[ACCESS_KEY])
-            self.assertIn(SECRET_KEY, krux_boto.boto.os.environ)
-            self.assertEqual(credential_map[SECRET_KEY], krux_boto.boto.os.environ[SECRET_KEY])
+            self.assertNotIn(ACCESS_KEY, krux_boto.boto.os.environ)
+            self.assertNotIn(SECRET_KEY, krux_boto.boto.os.environ)
 
         # Verify the warning is logged
         for key, val in credential_map.iteritems():
-            mock_logger.debug.assert_any_call('Setting boto credential %s to %s', key, '<empty>')
+            print mock_logger.debug.call_args_list
+            mock_logger.debug.assert_any_call('Passed boto credentials is empty. Falling back to environment variable %s', key)
+            mock_logger.debug.assert_not_called('Setting boto credential %s to %s', key, '<empty>')
             mock_logger.info.assert_any_call(
                 'Boto environment credential %s NOT explicitly set -- boto will look for a .boto file somewhere',
                 key,
@@ -134,7 +122,7 @@ class BotoTest(unittest.TestCase):
         --boto-log-level arguments sets the log level for boto correctly
         """
         self.boto = Boto(
-            parser=self._get_parser(['--boto-log-level', 'info']),
+            log_level='info',
         )
 
         self.assertEqual(INFO, krux.logging.get_logger('boto').getEffectiveLevel())
@@ -148,7 +136,6 @@ class BotoTest(unittest.TestCase):
 
         self.boto = Boto(
             logger=mock_logger,
-            parser=self._get_parser(),
         )
 
         # GOTCHA: Reset the logger to check only the property calling code, not the constructor
@@ -171,7 +158,6 @@ class BotoTest(unittest.TestCase):
 
         self.boto = Boto(
             logger=mock_logger,
-            parser=self._get_parser(),
         )
 
         # Verify a function can be called directly from krux_boto and returns the correct value

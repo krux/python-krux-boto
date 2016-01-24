@@ -73,9 +73,12 @@ class Boto(object):
 
     def __init__(
         self,
+        log_level=DEFAULT_LOG_LEVEL,
+        access_key=os.environ.get(ACCESS_KEY),
+        secret_key=os.environ.get(SECRET_KEY),
+        region=DEFAULT_REGION,
         logger=None,
         stats=None,
-        parser=None
     ):
 
         # Because we're wrapping boto directly, use ___ as a prefix for
@@ -83,10 +86,6 @@ class Boto(object):
         self.___name = NAME
         self.___logger = logger or get_logger(self.___name)
         self.___stats = stats or get_stats(prefix=self.___name)
-        self.___parser = parser or get_parser(description=self.___name)
-
-        # in case we got some of the information via the CLI
-        self.___args = self.___parser.parse_args()
 
         # this has to be 'public', so callers can use it. It's unfortunately
         # near impossible to transparently wrap this, because the boto.config
@@ -98,27 +97,25 @@ class Boto(object):
         # out connection strings etc. It's quite cumbersome.
         # So for now, we just store the region that was asked for, and let the
         # caller use it. See the sample app for a howto.
-        self.cli_region = self.___args.boto_region
+        self.cli_region = region
 
         # if these are set, make sure we set the environment again
         # as well; that way the underlying boto calls will just DTRT
         # without the need to wrap all the functions.
         credential_map = {
-            'boto_access_key': ACCESS_KEY,
-            'boto_secret_key': SECRET_KEY,
+            ACCESS_KEY: access_key,
+            SECRET_KEY: secret_key,
         }
 
-        for name, env_var in credential_map.iteritems():
-            val = getattr(self.___args, name, None)
-
-            if val is not None:
+        for env_var, val in credential_map.iteritems():
+            if val is None or len(val) < 1:
+                self.___logger.debug('Passed boto credentials is empty. Falling back to environment variable %s', env_var)
+            else:
 
                 # this way we can tell what credentials are being used,
                 # without dumping the whole secret into the logs
-                pp_val = val[0:3] + '[...]' + val[-3:] if len(val) else '<empty>'
-                self.___logger.debug(
-                    'Setting boto credential %s to %s', env_var, pp_val
-                )
+                pp_val = val[0:3] + '[...]' + val[-3:]
+                self.___logger.debug('Setting boto credential %s to %s', env_var, pp_val)
 
                 os.environ[env_var] = val
 
@@ -136,7 +133,7 @@ class Boto(object):
                 )
 
         # This sets the log level for the underlying boto library
-        get_logger('boto').setLevel(LEVELS[self.___args.boto_log_level])
+        get_logger('boto').setLevel(LEVELS[log_level])
 
         # access it via the object
         self.___boto = boto
