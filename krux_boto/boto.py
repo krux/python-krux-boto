@@ -37,10 +37,10 @@ NAME = 'krux-boto'
 
 # Defaults
 DEFAULT = {
-    'log_level': DEFAULT_LOG_LEVEL,
-    'access_key': os.environ.get(ACCESS_KEY),
-    'secret_key': os.environ.get(SECRET_KEY),
-    'region': 'us-east-1'
+    'log_level': lambda: DEFAULT_LOG_LEVEL,
+    'access_key': lambda: os.environ.get(ACCESS_KEY),
+    'secret_key': lambda: os.environ.get(SECRET_KEY),
+    'region': lambda: 'us-east-1'
 }
 
 
@@ -51,26 +51,26 @@ def add_boto_cli_arguments(parser):
 
     group.add_argument(
         '--boto-log-level',
-        default=DEFAULT['log_level'],
+        default=DEFAULT['log_level'](),
         choices=LEVELS.keys(),
         help='Verbosity of boto logging. (default: %(default)s)'
     )
 
     group.add_argument(
         '--boto-access-key',
-        default=DEFAULT['access_key'],
+        default=DEFAULT['access_key'](),
         help='AWS Access Key to use. Defaults to ENV[%s]' % ACCESS_KEY,
     )
 
     group.add_argument(
         '--boto-secret-key',
-        default=DEFAULT['secret_key'],
+        default=DEFAULT['secret_key'](),
         help='AWS Secret Key to use. Defaults to ENV[%s]' % SECRET_KEY,
     )
 
     group.add_argument(
         '--boto-region',
-        default=DEFAULT['region'],
+        default=DEFAULT['region'](),
         choices=[r.name for r in boto.ec2.regions()],
         help='EC2 Region to connect to. (default: %(default)s)',
     )
@@ -80,10 +80,10 @@ class Boto(object):
 
     def __init__(
         self,
-        log_level=DEFAULT['log_level'],
-        access_key=DEFAULT['access_key'],
-        secret_key=DEFAULT['secret_key'],
-        region=DEFAULT['region'],
+        log_level=None,
+        access_key=None,
+        secret_key=None,
+        region=None,
         logger=None,
         stats=None,
     ):
@@ -93,6 +93,18 @@ class Boto(object):
         self._name = NAME
         self._logger = logger or get_logger(self._name)
         self._stats = stats or get_stats(prefix=self._name)
+
+        if log_level is None:
+            log_level = DEFAULT['log_level']()
+
+        if access_key is None:
+            access_key = DEFAULT['access_key']()
+
+        if secret_key is None:
+            secret_key = DEFAULT['secret_key']()
+
+        if region is None:
+            region = DEFAULT['region']()
 
         # this has to be 'public', so callers can use it. It's unfortunately
         # near impossible to transparently wrap this, because the boto.config
