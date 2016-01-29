@@ -90,9 +90,9 @@ class Boto(object):
 
         # Because we're wrapping boto directly, use ___ as a prefix for
         # all our variables, so we don't clash with anything public
-        self.___name = NAME
-        self.___logger = logger or get_logger(self.___name)
-        self.___stats = stats or get_stats(prefix=self.___name)
+        self._name = NAME
+        self._logger = logger or get_logger(self._name)
+        self._stats = stats or get_stats(prefix=self._name)
 
         # this has to be 'public', so callers can use it. It's unfortunately
         # near impossible to transparently wrap this, because the boto.config
@@ -116,13 +116,13 @@ class Boto(object):
 
         for env_var, val in credential_map.iteritems():
             if val is None or len(val) < 1:
-                self.___logger.debug('Passed boto credentials is empty. Falling back to environment variable %s', env_var)
+                self._logger.debug('Passed boto credentials is empty. Falling back to environment variable %s', env_var)
             else:
 
                 # this way we can tell what credentials are being used,
                 # without dumping the whole secret into the logs
                 pp_val = val[0:3] + '[...]' + val[-3:]
-                self.___logger.debug('Setting boto credential %s to %s', env_var, pp_val)
+                self._logger.debug('Setting boto credential %s to %s', env_var, pp_val)
 
                 os.environ[env_var] = val
 
@@ -134,7 +134,7 @@ class Boto(object):
             # $ FOO= ./myprog.py
             # It'll return an empty string, and we'd not catch it.
             if not os.environ.get(env_var, None):
-                self.___logger.info(
+                self._logger.info(
                     'Boto environment credential %s NOT explicitly set ' +
                     '-- boto will look for a .boto file somewhere', env_var
                 )
@@ -143,7 +143,7 @@ class Boto(object):
         get_logger('boto').setLevel(LEVELS[log_level])
 
         # access it via the object
-        self.___boto = boto
+        self._boto = boto
 
     def __getattr__(self, attr):
         """Proxies calls to ``boto.*`` methods."""
@@ -153,12 +153,12 @@ class Boto(object):
         # This also gives us hooks for future logging/timers/etc and
         # extended wrapping of things the attributes return if we so
         # choose.
-        self.___logger.debug('Calling wrapped boto attribute: %s', attr)
+        self._logger.debug('Calling wrapped boto attribute: %s', attr)
 
-        attr = getattr(self.___boto, attr)
+        attr = getattr(self._boto, attr)
 
         if callable(attr):
-            self.___logger.debug("Boto attribute '%s' is callable", attr)
+            self._logger.debug("Boto attribute '%s' is callable", attr)
 
             @wraps(attr)
             def wrapper(*args, **kwargs):
