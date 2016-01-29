@@ -34,7 +34,14 @@ from krux.cli import get_parser, get_group
 ACCESS_KEY = 'AWS_ACCESS_KEY_ID'
 SECRET_KEY = 'AWS_SECRET_ACCESS_KEY'
 NAME = 'krux-boto'
-DEFAULT_REGION = 'us-east-1'
+
+# Defaults
+DEFAULT = {
+    'log_level': DEFAULT_LOG_LEVEL,
+    'access_key': os.environ.get(ACCESS_KEY),
+    'secret_key': os.environ.get(SECRET_KEY),
+    'region': 'us-east-1'
+}
 
 
 # Designed to be called from krux.cli, or programs inheriting from it
@@ -44,26 +51,26 @@ def add_boto_cli_arguments(parser):
 
     group.add_argument(
         '--boto-log-level',
-        default=DEFAULT_LOG_LEVEL,
+        default=DEFAULT['log_level'],
         choices=LEVELS.keys(),
         help='Verbosity of boto logging. (default: %(default)s)'
     )
 
     group.add_argument(
         '--boto-access-key',
-        default=os.environ.get(ACCESS_KEY),
+        default=DEFAULT['access_key'],
         help='AWS Access Key to use. Defaults to ENV[%s]' % ACCESS_KEY,
     )
 
     group.add_argument(
         '--boto-secret-key',
-        default=os.environ.get(SECRET_KEY),
+        default=DEFAULT['secret_key'],
         help='AWS Secret Key to use. Defaults to ENV[%s]' % SECRET_KEY,
     )
 
     group.add_argument(
         '--boto-region',
-        default=DEFAULT_REGION,
+        default=DEFAULT['region'],
         choices=[r.name for r in boto.ec2.regions()],
         help='EC2 Region to connect to. (default: %(default)s)',
     )
@@ -73,10 +80,10 @@ class Boto(object):
 
     def __init__(
         self,
-        log_level=DEFAULT_LOG_LEVEL,
-        access_key=os.environ.get(ACCESS_KEY),
-        secret_key=os.environ.get(SECRET_KEY),
-        region=DEFAULT_REGION,
+        log_level=DEFAULT['log_level'],
+        access_key=DEFAULT['access_key'],
+        secret_key=DEFAULT['secret_key'],
+        region=DEFAULT['region'],
         logger=None,
         stats=None,
     ):
