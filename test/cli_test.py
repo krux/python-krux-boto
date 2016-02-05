@@ -58,7 +58,8 @@ class CLItest(unittest.TestCase):
         self.assertIn('boto_region', args)
         self.assertIn('boto_log_level', args)
 
-    def test_main(self):
+    @patch('krux_boto.cli.krux.cli.sys.exit')
+    def test_main(self, mock_exit):
         """
         Main method runs correctly
         """
@@ -76,3 +77,6 @@ class CLItest(unittest.TestCase):
         mock_logger.warn.assert_any_call('Connected to region: %s', 'us-east-1')
         for region in boto.connect_ec2().get_all_regions():
             mock_logger.warn.assert_any_call('Region: %s', region.name)
+
+        # Verify the mock sys.exit has been called
+        mock_exit.assert_called_once_with(0)

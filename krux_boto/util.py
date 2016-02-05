@@ -33,7 +33,7 @@ def get_instance_region():
     placed in. If the metadata service can't be contacted, return a generic
     default instead.
     """
-    ### TODO: XXX This shouldn't get called if we're not on EC2.
+    # TODO: XXX This shouldn't get called if we're not on EC2.
     zone = boto.utils.get_instance_metadata().get('placement', {}).get('availability-zone', None)
     if zone is None:
         get_logger('krux_boto').warn('get_instance_region failed to get the local instance region')
