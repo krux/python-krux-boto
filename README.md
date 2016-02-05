@@ -81,7 +81,9 @@ class MyApplication( object ):
 |secret_key|AWS Secret Key to use|Environment variable `$AWS_SECRET_ACCESS_KEY`|
 |log_level|Verbosity of boto logging (Choose between `critical`, `error`, `warning`, `info`, `debug`)|`warning`|
 |region|EC2 Region to connect to|`us-east-1`|
-*NOTE:* This info can also be found in `krux_boto.Boto.add_boto_cli_arguments`.
+*NOTE:*
+* This info can also be found in `krux_boto.Boto.add_boto_cli_arguments`
+* All arguments are string
 
 Seeing it in action
 -------------------
