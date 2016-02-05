@@ -28,6 +28,8 @@ setup(
     version=VERSION,
     author='Jos Boumans',
     author_email='jos@krux.com',
+    maintainer='Peter Han',
+    maintainer_email='phan@krux.com',
     description='Library for interacting with boto built on krux-stdlib',
     url=REPO_URL,
     download_url=DOWNLOAD_URL,
