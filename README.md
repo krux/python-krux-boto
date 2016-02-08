@@ -6,7 +6,7 @@ Krux Python class built on top of [Krux Stdlib](https://staticfiles.krxd.net/fos
 Application quick start
 -----------------------
 
-The most common use case is to build a script on top of boto.
+The most common use case is to build a CLI script on top of boto.
 Here's how to do that:
 
 ```python
@@ -25,7 +25,7 @@ def main():
 
     ### This gets you a region object based on the preference of
     ### the CLI parameters passed:
-    region = boto.ec2.get_region(app.boto.cli_region)
+    region = app.boto.ec2.get_region(app.boto.cli_region)
 
     ### Sample program: connect to ec2 and list the regions:
     ec2 = app.boto.connect_ec2(region = region)
@@ -45,35 +45,45 @@ if __name__ == '__main__':
 Extending your application
 --------------------------
 
-Alternately, you want to add boto functionality to your larger script
-or application that might be built on krux.cli.Application as well.
+Alternately, you want to add boto functionality to your larger script or application.
 Here's how to do that:
 
 ```python
 
+from krux_boto import Boto
 
-import krux.cli
-from krux_boto import add_boto_cli_arguments
+class MyApplication( object ):
 
-class MyApplication( krux.cli.Application ):
+    BOTO_ACCCESS_KEY = 'fakeAccessKey'
+    BOTO_SECRET_KEY = 'fakeSecretKey'
+    BOTO_LOG_LEVEL = 'info'
+    BOTO_REGION = 'us-east-1'
 
     def __init__(self, *args, **kwargs):
-        ### Call to the superclass to bootstrap.
-        super(MyApplication, self).__init__(name = 'my-application')
-
         self.boto = Boto(
-            parser = self.parser,
-            logger = self.logger,
-            stats  = self.stats,
+            log_level=self.BOTO_LOG_LEVEL,
+            access_key=self.BOTO_ACCESS_KEY,
+            secret_key=self.BOTO_SECRET_KEY,
+            region=self.BOTO_REGION,
+            logger=self.logger,
+            stats=self.stats,
         )
 
-    def add_cli_arguments(self, parser):
-
-        ### add the arguments for boto
-        add_boto_cli_arguments(parser)
+    def run(self):
+        print self.boto.ec2.get_region(self.boto.cli_region).name
 
 ```
 
+### Constructor Arguments
+|Name|Value|Default|
+|---|---|---|
+|access_key|AWS Access Key to use|Environment variable `$AWS_ACCESS_KEY_ID`|
+|secret_key|AWS Secret Key to use|Environment variable `$AWS_SECRET_ACCESS_KEY`|
+|log_level|Verbosity of boto logging (Choose between `critical`, `error`, `warning`, `info`, `debug`)|`warning`|
+|region|EC2 Region to connect to|`us-east-1`|
+*NOTE:*
+* This info can also be found in `krux_boto.Boto.add_boto_cli_arguments`
+* All arguments are string
 
 Seeing it in action
 -------------------
