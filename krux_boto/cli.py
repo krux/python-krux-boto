@@ -25,9 +25,9 @@ from krux_boto.boto import Boto, add_boto_cli_arguments, NAME
 
 class Application(krux.cli.Application):
 
-    def __init__(self, name=NAME):
+    def __init__(self, name=NAME, *args, **kwargs):
         # Call to the superclass to bootstrap.
-        super(Application, self).__init__(name=name)
+        super(Application, self).__init__(name=name, *args, **kwargs)
 
         self.boto = Boto(
             log_level=self.args.boto_log_level,
