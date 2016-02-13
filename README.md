@@ -45,6 +45,27 @@ if __name__ == '__main__':
 Extending your application
 --------------------------
 
+From other CLI applications, you can make the use of `krux_boto.boto.get_boto()` function.
+
+```python
+
+from krux_boto.boto import get_boto, add_boto_cli_arguments
+import krux.cli
+
+class Application(krux.cli.Application):
+
+    def __init__(self, *args, **kwargs):
+        super(Application, self).__init__(*args, **kwargs)
+
+        self.boto = get_boto(self.args, self.logger, self.stats)
+
+    def add_cli_arguments(self, parser):
+        super(Application, self).add_cli_arguments(parser)
+
+        add_boto_cli_arguments(parser)
+
+```
+
 Alternately, you want to add boto functionality to your larger script or application.
 Here's how to do that:
 
