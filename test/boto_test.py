@@ -71,15 +71,13 @@ class BotoTest(unittest.TestCase):
 
         # Verify logging
         for key, val in credential_map.iteritems():
-            mock_logger.debug.assert_not_called(
-                'Passed boto credentials is empty. Falling back to environment variable %s',
-                key,
+            self.assertTrue(
+                ('Passed boto credentials is empty. Falling back to environment variable %s', key) not in mock_logger.debug.call_args_list
             )
             obsc = val[0:3] + '[...]' + val[-3:]
             mock_logger.debug.assert_any_call('Setting boto credential %s to %s', key, obsc)
-            mock_logger.info.assert_not_called(
-                'Boto environment credential %s NOT explicitly set -- boto will look for a .boto file somewhere',
-                key,
+            self.assertTrue(
+                ('Boto environment credential %s NOT explicitly set -- boto will look for a .boto file somewhere', key) not in mock_logger.info.call_args_list
             )
 
     def test_credential_logging_empty(self):
@@ -111,7 +109,7 @@ class BotoTest(unittest.TestCase):
         for key, val in credential_map.iteritems():
             print mock_logger.debug.call_args_list
             mock_logger.debug.assert_any_call('Passed boto credentials is empty. Falling back to environment variable %s', key)
-            mock_logger.debug.assert_not_called('Setting boto credential %s to %s', key, '<empty>')
+            self.assertTrue(('Setting boto credential %s to %s', key, '<empty>') not in mock_logger.debug.call_args_list)
             mock_logger.info.assert_any_call(
                 'Boto environment credential %s NOT explicitly set -- boto will look for a .boto file somewhere',
                 key,
@@ -147,7 +145,7 @@ class BotoTest(unittest.TestCase):
 
         # Verify logging
         mock_logger.debug.assert_called_once_with('Calling wrapped boto attribute: %s', 'ec2')
-        mock_logger.debug.assert_not_called("Boto attribute '%s' is callable", 'connect_ec2')
+        self.assertTrue(("Boto attribute '%s' is callable", 'connect_ec2') not in mock_logger.debug.call_args_list)
 
     def test_get_attr_function(self):
         """
