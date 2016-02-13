@@ -32,6 +32,8 @@ class Application(krux.cli.Application):
         self.boto = get_boto(self.args, self.logger, self.stats)
 
     def add_cli_arguments(self, parser):
+        super(Application, self).add_cli_arguments(parser)
+
         # add the arguments for boto
         add_boto_cli_arguments(parser)
 
