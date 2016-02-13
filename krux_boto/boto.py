@@ -47,36 +47,20 @@ DEFAULT = {
     'region': lambda: 'us-east-1'
 }
 
-#
-# Return a usable Boto object without creating a class around it.
-#
-# In the context of a krux.cli (or similar) interface the 'args', 'logger'
-# and 'stats' objects should already be present. If you don't have them, 
-# however, we'll attempt to provide usable ones for the boto setup.
-#
-# Usage of this function will look something like this:
-#
-#=========
-# from krux_boto.boto import get_boto, add_boto_cli_arguments
-# import krux.cli
-#
-# class Application(krux_.cli.Application):
-#    def __init__(self, *args, **kwargs):
-#        super(Application, self).__init__(*args, **kwargs)
-#
-#        self.boto = get_boto(self.args, self.logger, self.stats)
-#
-#   def add_cli_arguments(self, parser):
-#        super(Application, self).add_cli_arguments(parser)
-#        add_boto_cli_arguments(parser)
-#
-#=========
-#
-# (If you omit the add_boto_cli_arguments() call during other cli setup,
-# the Boto object will still work, but its cli options won't show up in 
-# --help output)
-#
+
 def get_boto(args=None, logger=None, stats=None):
+    """
+    Return a usable Boto object without creating a class around it.
+
+    In the context of a krux.cli (or similar) interface the 'args', 'logger'
+    and 'stats' objects should already be present. If you don't have them,
+    however, we'll attempt to provide usable ones for the boto setup.
+
+    (If you omit the add_boto_cli_arguments() call during other cli setup,
+    the Boto object will still work, but its cli options won't show up in
+    --help output)
+    """
+
     if not args:
         parser = get_parser()
         add_boto_cli_arguments(parser)
@@ -96,6 +80,7 @@ def get_boto(args=None, logger=None, stats=None):
         logger=logger,
         stats=stats,
     )
+
 
 # Designed to be called from krux.cli, or programs inheriting from it
 def add_boto_cli_arguments(parser):
