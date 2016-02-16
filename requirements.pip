@@ -19,7 +19,7 @@ Jinja2==2.8
 Pygments==2.1
 docutils==0.12
 kruxstatsd==0.2.4
-statsd==2.0.3
+statsd==2.0.3  # statsd is pegged at 2.0.3 by kruxstatsd
 argparse==1.4.0
 GitPython==1.0.2
 simplejson==3.8.1
