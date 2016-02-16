@@ -20,7 +20,7 @@ import boto
 #
 
 import krux.cli
-from krux_boto.boto import Boto, add_boto_cli_arguments, NAME
+from krux_boto.boto import add_boto_cli_arguments, get_boto, NAME
 
 
 class Application(krux.cli.Application):
@@ -29,16 +29,11 @@ class Application(krux.cli.Application):
         # Call to the superclass to bootstrap.
         super(Application, self).__init__(name=name)
 
-        self.boto = Boto(
-            log_level=self.args.boto_log_level,
-            access_key=self.args.boto_access_key,
-            secret_key=self.args.boto_secret_key,
-            region=self.args.boto_region,
-            logger=self.logger,
-            stats=self.stats,
-        )
+        self.boto = get_boto(self.args, self.logger, self.stats)
 
     def add_cli_arguments(self, parser):
+        super(Application, self).add_cli_arguments(parser)
+
         # add the arguments for boto
         add_boto_cli_arguments(parser)
 
