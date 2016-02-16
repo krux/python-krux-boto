@@ -47,7 +47,7 @@ class UtilTest(unittest.TestCase):
                 self.assertEquals('us-east-1', get_instance_region())
 
         # Verify no warning is thrown
-        mock_logger.warn.assert_not_called('get_instance_region failed to get the local instance region')
+        self.assertTrue(('get_instance_region failed to get the local instance region') not in mock_logger.warn.call_args_list)
 
     def test_get_instance_region_failure(self):
         """
