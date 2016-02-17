@@ -53,15 +53,14 @@ class Application(krux.cli.Application):
             self.logger.warn('Region: %s', r.name)
 
     def _sample_boto3(self):
-        ec2 = self.boto3.resource('ec2')
+        ec2 = self.boto3.client('ec2')
 
-        pprint(self.boto3.cli_region)
+        self.logger.warn('Connected to region via boto3: %s', self.boto3.cli_region)
 
-#        self.logger.warn('Connected to region via boto3: %s', region.name)
-#        for r in ec2.get_all_regions():
-#            self.logger.warn('Region: %s', r.name)
-
-
+        # See here for docs/return values:
+        # http://boto3.readthedocs.org/en/latest/reference/services/ec2.html#EC2.Client.describe_regions
+        for rv in ec2.describe_regions().get('Regions', []):
+            self.logger.warn('Region: %s', rv.get('RegionName'))
 
 def main():
     app = Application()

@@ -185,6 +185,10 @@ class BaseBoto(object):
         if region is None:
             region = DEFAULT['region']()
 
+        # Infer the loglevel, but set it as a property so the subclasses can
+        # use it to set the loglevels on the loghandlers for their implementation
+        self._boto_log_level = LEVELS[log_level]
+
         # this has to be 'public', so callers can use it. It's unfortunately
         # near impossible to transparently wrap this, because the boto.config
         # is initialized before we get here, and all the classes do a look up
@@ -230,9 +234,6 @@ class BaseBoto(object):
                     '-- boto will look for a .boto file somewhere', env_var
                 )
 
-        # This sets the log level for the underlying boto library
-        get_logger('boto').setLevel(LEVELS[log_level])
-
     def __getattr__(self, attr):
         """Proxies calls to ``boto.*`` methods."""
 
@@ -269,6 +270,10 @@ class Boto(BaseBoto):
         # or the objects returned via the get_boto* calls
         self._boto = boto
 
+        # This sets the log level for the underlying boto library
+        get_logger('boto').setLevel(self._boto_log_level)
+
+
 class Boto3(BaseBoto):
 
     # All the hard work is done in the superclass. We just need to use the
@@ -282,11 +287,20 @@ class Boto3(BaseBoto):
         # the boto3 class invocation, but it uses your custom settings instead.
         # Read here for details: http://boto3.readthedocs.org/en/latest/guide/session.html
 
-        # Creating your own session
+        # Creating your own session, based on the region that was passed in
         session = boto3.session.Session(region_name=self.cli_region)
 
         # access the boto classes via the session. Note these are just the
         # classes for internal use, NOT the object as exposed via the CLI
         # or the objects returned via the get_boto* calls
         self._boto = session
+
+        # This sets the log level for the underlying boto library
+        # http://boto3.readthedocs.org/en/latest/reference/core/boto3.html?highlight=logging
+        # XXX note that the name of the default boto3 logger is NOT boto3, it's
+        # called 'botocore'
+        get_logger('botocore').setLevel(self._boto_log_level)
+
+
+
 
