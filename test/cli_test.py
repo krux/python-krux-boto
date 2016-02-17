@@ -74,7 +74,7 @@ class CLItest(unittest.TestCase):
             main()
 
         # Verify the current region and all regions are logged as warning
-        mock_logger.warn.assert_any_call('Connected to region: %s', 'us-east-1')
+        mock_logger.warn.assert_any_call('Connected to region via boto2: %s', 'us-east-1')
         for region in boto.connect_ec2().get_all_regions():
             mock_logger.warn.assert_any_call('Region: %s', region.name)
 

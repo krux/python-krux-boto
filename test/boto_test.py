@@ -27,7 +27,7 @@ from mock import MagicMock, patch
 import krux_boto.boto
 import krux.cli
 import krux.logging
-from krux_boto.boto import Boto, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY
+from krux_boto.boto import Boto, Boto3, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY
 
 
 class BotoTest(unittest.TestCase):
