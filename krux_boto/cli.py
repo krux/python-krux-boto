@@ -8,6 +8,7 @@
 #
 
 from __future__ import absolute_import
+from pprint import pprint
 
 #
 # Third party libraries
@@ -20,7 +21,7 @@ import boto
 #
 
 import krux.cli
-from krux_boto.boto import add_boto_cli_arguments, get_boto, NAME
+from krux_boto.boto import add_boto_cli_arguments, get_boto, get_boto3, NAME
 
 
 class Application(krux.cli.Application):
@@ -31,7 +32,7 @@ class Application(krux.cli.Application):
 
         self.boto = get_boto(self.args, self.logger, self.stats)
 
-        self.boto3 = 'XXX FIX ME'
+        self.boto3 = get_boto3(self.args, self.logger, self.stats)
 
     def add_cli_arguments(self, parser):
         super(Application, self).add_cli_arguments(parser)
@@ -40,10 +41,12 @@ class Application(krux.cli.Application):
         add_boto_cli_arguments(parser)
 
     def run(self):
-        self._sample_boto2()
+        #self._sample_boto2()
         self._sample_boto3()
 
     def _sample_boto2(self):
+
+        pprint(self.boto.ec2)
         region = self.boto.ec2.get_region(self.boto.cli_region)
         ec2 = self.boto.connect_ec2(region=region)
 
@@ -52,7 +55,12 @@ class Application(krux.cli.Application):
             self.logger.warn('Region: %s', r.name)
 
     def _sample_boto3(self):
-        pass
+        ec2 = self.boto3.resource('ec2')
+
+#        self.logger.warn('Connected to region via boto3: %s', region.name)
+#        for r in ec2.get_all_regions():
+#            self.logger.warn('Region: %s', r.name)
+
 
 
 def main():
