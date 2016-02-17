@@ -45,8 +45,6 @@ class Application(krux.cli.Application):
         self._sample_boto3()
 
     def _sample_boto2(self):
-
-        pprint(self.boto.ec2)
         region = self.boto.ec2.get_region(self.boto.cli_region)
         ec2 = self.boto.connect_ec2(region=region)
 
@@ -56,6 +54,8 @@ class Application(krux.cli.Application):
 
     def _sample_boto3(self):
         ec2 = self.boto3.resource('ec2')
+
+        pprint(self.boto3.cli_region)
 
 #        self.logger.warn('Connected to region via boto3: %s', region.name)
 #        for r in ec2.get_all_regions():
