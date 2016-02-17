@@ -24,7 +24,7 @@ from mock import MagicMock, patch
 #
 
 from krux.stats import DummyStatsClient
-from krux_boto.boto import Boto, add_boto_cli_arguments, NAME
+from krux_boto.boto import Boto, Boto3, add_boto_cli_arguments, NAME
 from krux_boto.cli import Application, main
 
 
@@ -44,6 +44,7 @@ class CLItest(unittest.TestCase):
         self.assertEqual(NAME, self.app.logger.name)
 
         self.assertIsInstance(self.app.boto, Boto)
+        self.assertIsInstance(self.app.boto3, Boto3)
 
     def test_add_cli_arguments(self):
         """
@@ -75,6 +76,8 @@ class CLItest(unittest.TestCase):
 
         # Verify the current region and all regions are logged as warning
         mock_logger.warn.assert_any_call('Connected to region via boto2: %s', 'us-east-1')
+        mock_logger.warn.assert_any_call('Connected to region via boto3: %s', 'us-east-1')
+
         for region in boto.connect_ec2().get_all_regions():
             mock_logger.warn.assert_any_call('Region: %s', region.name)
 
