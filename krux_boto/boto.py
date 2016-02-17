@@ -201,8 +201,10 @@ class BaseBoto(object):
         # This sets the log level for the underlying boto library
         get_logger('boto').setLevel(LEVELS[log_level])
 
-        # access it via the object
+        # access the boto classes via the object
         self._boto = boto
+        self._boto3 = boto3
+
 
     def __getattr__(self, attr):
         """Proxies calls to ``boto.*`` methods."""
