@@ -144,7 +144,7 @@ class BotoTest(unittest.TestCase):
         self.assertEqual(boto.ec2, self.boto.ec2)
 
         # Verify logging
-        mock_logger.debug.assert_called_once_with('Calling wrapped boto attribute: %s', 'ec2')
+        mock_logger.debug.assert_called_once_with('Calling wrapped boto attribute: %s on %s', 'ec2', self.boto)
         self.assertTrue(("Boto attribute '%s' is callable", 'connect_ec2') not in mock_logger.debug.call_args_list)
 
     def test_get_attr_function(self):
@@ -163,5 +163,5 @@ class BotoTest(unittest.TestCase):
         self.assertIsInstance(self.boto.connect_ec2(), boto.ec2.EC2Connection)
 
         # Verify logging
-        mock_logger.debug.assert_any_call('Calling wrapped boto attribute: %s', 'connect_ec2')
+        mock_logger.debug.assert_any_call('Calling wrapped boto attribute: %s on %s', 'connect_ec2', self.boto)
         mock_logger.debug.assert_any_call("Boto attribute '%s' is callable", boto.connect_ec2)

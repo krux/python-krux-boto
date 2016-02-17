@@ -41,7 +41,7 @@ class Application(krux.cli.Application):
         add_boto_cli_arguments(parser)
 
     def run(self):
-        #self._sample_boto2()
+        self._sample_boto2()
         self._sample_boto3()
 
     def _sample_boto2(self):

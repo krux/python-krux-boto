@@ -114,11 +114,7 @@ def get_boto3(args=None, logger=None, stats=None):
     if not stats:
         stats = get_stats(prefix="boto")
 
-    # In boto3, the custom settings like region and connection params are
-    # stored in what's called a 'session'. This object behaves just like
-    # the boto3 class invocation, but it uses your custom settings instead.
-    # Read here for details: http://boto3.readthedocs.org/en/latest/guide/session.html
-    obj = Boto3(
+    return Boto3(
         log_level=args.boto_log_level,
         access_key=args.boto_access_key,
         secret_key=args.boto_secret_key,
@@ -126,9 +122,6 @@ def get_boto3(args=None, logger=None, stats=None):
         logger=logger,
         stats=stats,
     )
-
-    # The session mentioned above is stored in the _boto3 keyword
-    return obj._boto3
 
 # Designed to be called from krux.cli, or programs inheriting from it
 def add_boto_cli_arguments(parser):
@@ -249,7 +242,9 @@ class BaseBoto(object):
         # extended wrapping of things the attributes return if we so
         # choose.
 
-        print "GOT HERE"
+        self._logger.debug('Calling wrapped boto attribute: %s on %s', attr, self)
+
+        attr = getattr(self._boto, attr)
 
         if callable(attr):
             self._logger.debug("Boto attribute '%s' is callable", attr)
@@ -274,16 +269,6 @@ class Boto(BaseBoto):
         # or the objects returned via the get_boto* calls
         self._boto = boto
 
-
-    def __getattr__(self, attr):
-        attr = getattr(self._boto, attr)
-
-        self._logger.debug('Calling wrapped boto2 attribute: %s', attr)
-
-        # Call to the superclass to resolve.
-        super(Boto, self).__getattr__(attr)
-
-
 class Boto3(BaseBoto):
 
     # All the hard work is done in the superclass. We just need to use the
@@ -300,16 +285,8 @@ class Boto3(BaseBoto):
         # Creating your own session
         session = boto3.session.Session(region_name=self.cli_region)
 
-        # access the boto classes via the object. Note these are just the
+        # access the boto classes via the session. Note these are just the
         # classes for internal use, NOT the object as exposed via the CLI
         # or the objects returned via the get_boto* calls
-        self._boto3 = session
-
-    def __getattr__(self, attr):
-        attr = getattr(self._boto3, attr)
-
-        self._logger.debug('Calling wrapped boto3 attribute: %s', attr)
-
-        # Call to the superclass to resolve.
-        super(Boto3, self).__getattr__(attr)
+        self._boto = session
 
