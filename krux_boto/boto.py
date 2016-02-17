@@ -17,9 +17,18 @@ import os
 # Third party libraries
 #
 
+# For differences between version2 & version3, please see here:
+# http://boto3.readthedocs.org/en/latest/guide/migration.html
+
+# Version2
 import boto
 import boto.ec2
 import boto.utils
+
+# Version3
+import boto3
+
+
 
 #
 # Internal libraries
@@ -114,7 +123,7 @@ def add_boto_cli_arguments(parser):
     )
 
 
-class Boto(object):
+class BaseBoto(object):
 
     def __init__(
         self,
@@ -216,3 +225,10 @@ class Boto(object):
             return wrapper
 
         return attr
+
+class Boto(BaseBoto):
+    pass
+
+class Boto3(BaseBoto):
+    pass
+
