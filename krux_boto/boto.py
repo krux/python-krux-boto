@@ -11,6 +11,10 @@ from __future__ import absolute_import
 from pprint import pprint
 from functools import wraps
 
+# Declare the baseboto class a metaclass to avoid
+# it being used directly
+from abc import ABCMeta
+
 import os
 
 #
@@ -79,7 +83,7 @@ def get_boto(args=None, logger=None, stats=None):
         logger = get_logger(name=NAME)
 
     if not stats:
-        stats = get_stats(prefix="boto")
+        stats = get_stats(prefix=NAME)
 
     return Boto(
         log_level=args.boto_log_level,
@@ -112,7 +116,7 @@ def get_boto3(args=None, logger=None, stats=None):
         logger = get_logger(name=NAME)
 
     if not stats:
-        stats = get_stats(prefix="boto")
+        stats = get_stats(prefix=NAME)
 
     return Boto3(
         log_level=args.boto_log_level,
@@ -156,6 +160,9 @@ def add_boto_cli_arguments(parser):
 
 
 class BaseBoto(object):
+    # This is an abstract class, which prevents direct instantiation. See here
+    # for details: https://docs.python.org/2/library/abc.html
+    __metaclass__ = ABCMeta
 
     def __init__(
         self,
@@ -273,6 +280,9 @@ class Boto(BaseBoto):
         # This sets the log level for the underlying boto library
         get_logger('boto').setLevel(self._boto_log_level)
 
+# Still inherit from BaseBoto, otherwise super().__init__ doesn't work
+#BaseBoto.register(Boto)
+
 
 class Boto3(BaseBoto):
 
@@ -301,6 +311,8 @@ class Boto3(BaseBoto):
         # called 'botocore'
         get_logger('botocore').setLevel(self._boto_log_level)
 
+# Still inherit from BaseBoto, otherwise super().__init__ doesn't work
+#BaseBoto.register(Boto3)
 
 
 
