@@ -7,7 +7,7 @@ krux-stdlib==2.1.1
 # The library this is wrapping
 boto==2.39.0
 
-# Transient libraries
+# Transitive libraries
 # This is needed so there are no version conflicts when
 # one downstream library does NOT specify the version it wants,
 # and another one does.
