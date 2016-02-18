@@ -106,6 +106,15 @@ class MyApplication( object ):
 * This info can also be found in `krux_boto.Boto.add_boto_cli_arguments`
 * All arguments are string
 
+Developing python-krux-boto
+----------------------
+
+1. `user:~$ git clone git@github.com:krux/python-krux-boto.git`
+2. `user:python-krux-boto$ pip install -r dev-requirements.pip`
+3. `user:python-krux-boto$ nosetests`
+
+The tests should all pass. Now you are ready to improve this library.
+
 Seeing it in action
 -------------------
 
