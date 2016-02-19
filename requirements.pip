@@ -9,7 +9,7 @@ boto==2.39.0
 # Boto3 is out now as well, and we want to offer access to both
 boto3==1.2.3
 
-# Transient libraries
+# Transitive libraries
 # This is needed so there are no version conflicts when
 # one downstream library does NOT specify the version it wants,
 # and another one does.
