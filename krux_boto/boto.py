@@ -11,15 +11,28 @@ from __future__ import absolute_import
 from pprint import pprint
 from functools import wraps
 
+# Declare the baseboto class a metaclass to avoid
+# it being used directly
+from abc import ABCMeta
+
 import os
 
 #
 # Third party libraries
 #
 
+# For differences between version2 & version3, please see here:
+# http://boto3.readthedocs.org/en/latest/guide/migration.html
+
+# Version2
 import boto
 import boto.ec2
 import boto.utils
+
+# Version3
+import boto3
+
+
 
 #
 # Internal libraries
@@ -70,7 +83,7 @@ def get_boto(args=None, logger=None, stats=None):
         logger = get_logger(name=NAME)
 
     if not stats:
-        stats = get_stats(prefix="boto")
+        stats = get_stats(prefix=NAME)
 
     return Boto(
         log_level=args.boto_log_level,
@@ -81,6 +94,38 @@ def get_boto(args=None, logger=None, stats=None):
         stats=stats,
     )
 
+def get_boto3(args=None, logger=None, stats=None):
+    """
+    Return a usable Boto3 object without creating a class around it.
+
+    In the context of a krux.cli (or similar) interface the 'args', 'logger'
+    and 'stats' objects should already be present. If you don't have them,
+    however, we'll attempt to provide usable ones for the boto setup.
+
+    (If you omit the add_boto_cli_arguments() call during other cli setup,
+    the Boto object will still work, but its cli options won't show up in
+    --help output)
+    """
+
+    if not args:
+        parser = get_parser()
+        add_boto_cli_arguments(parser)
+        args = parser.parse_args()
+
+    if not logger:
+        logger = get_logger(name=NAME)
+
+    if not stats:
+        stats = get_stats(prefix=NAME)
+
+    return Boto3(
+        log_level=args.boto_log_level,
+        access_key=args.boto_access_key,
+        secret_key=args.boto_secret_key,
+        region=args.boto_region,
+        logger=logger,
+        stats=stats,
+    )
 
 # Designed to be called from krux.cli, or programs inheriting from it
 def add_boto_cli_arguments(parser):
@@ -114,7 +159,10 @@ def add_boto_cli_arguments(parser):
     )
 
 
-class Boto(object):
+class BaseBoto(object):
+    # This is an abstract class, which prevents direct instantiation. See here
+    # for details: https://docs.python.org/2/library/abc.html
+    __metaclass__ = ABCMeta
 
     def __init__(
         self,
@@ -143,6 +191,10 @@ class Boto(object):
 
         if region is None:
             region = DEFAULT['region']()
+
+        # Infer the loglevel, but set it as a property so the subclasses can
+        # use it to set the loglevels on the loghandlers for their implementation
+        self._boto_log_level = LEVELS[log_level]
 
         # this has to be 'public', so callers can use it. It's unfortunately
         # near impossible to transparently wrap this, because the boto.config
@@ -189,12 +241,6 @@ class Boto(object):
                     '-- boto will look for a .boto file somewhere', env_var
                 )
 
-        # This sets the log level for the underlying boto library
-        get_logger('boto').setLevel(LEVELS[log_level])
-
-        # access it via the object
-        self._boto = boto
-
     def __getattr__(self, attr):
         """Proxies calls to ``boto.*`` methods."""
 
@@ -203,7 +249,8 @@ class Boto(object):
         # This also gives us hooks for future logging/timers/etc and
         # extended wrapping of things the attributes return if we so
         # choose.
-        self._logger.debug('Calling wrapped boto attribute: %s', attr)
+
+        self._logger.debug('Calling wrapped boto attribute: %s on %s', attr, self)
 
         attr = getattr(self._boto, attr)
 
@@ -216,3 +263,56 @@ class Boto(object):
             return wrapper
 
         return attr
+
+class Boto(BaseBoto):
+
+    # All the hard work is done in the superclass. We just need to use the
+    # resulting object to initialize a session properly.
+    def __init__(self, *args, **kwargs):
+        # Call to the superclass to resolve.
+        super(Boto, self).__init__(*args, **kwargs)
+
+        # access the boto classes via the object. Note these are just the
+        # classes for internal use, NOT the object as exposed via the CLI
+        # or the objects returned via the get_boto* calls
+        self._boto = boto
+
+        # This sets the log level for the underlying boto library
+        get_logger('boto').setLevel(self._boto_log_level)
+
+# Still inherit from BaseBoto, otherwise super().__init__ doesn't work
+#BaseBoto.register(Boto)
+
+
+class Boto3(BaseBoto):
+
+    # All the hard work is done in the superclass. We just need to use the
+    # resulting object to initialize a session properly.
+    def __init__(self, *args, **kwargs):
+        # Call to the superclass to resolve.
+        super(Boto3, self).__init__(*args, **kwargs)
+
+        # In boto3, the custom settings like region and connection params are
+        # stored in what's called a 'session'. This object behaves just like
+        # the boto3 class invocation, but it uses your custom settings instead.
+        # Read here for details: http://boto3.readthedocs.org/en/latest/guide/session.html
+
+        # Creating your own session, based on the region that was passed in
+        session = boto3.session.Session(region_name=self.cli_region)
+
+        # access the boto classes via the session. Note these are just the
+        # classes for internal use, NOT the object as exposed via the CLI
+        # or the objects returned via the get_boto* calls
+        self._boto = session
+
+        # This sets the log level for the underlying boto library
+        # http://boto3.readthedocs.org/en/latest/reference/core/boto3.html?highlight=logging
+        # XXX note that the name of the default boto3 logger is NOT boto3, it's
+        # called 'botocore'
+        get_logger('botocore').setLevel(self._boto_log_level)
+
+# Still inherit from BaseBoto, otherwise super().__init__ doesn't work
+#BaseBoto.register(Boto3)
+
+
+

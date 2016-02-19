@@ -1,7 +1,7 @@
 python-krux-boto
 =====================
 
-Krux Python class built on top of [Krux Stdlib](https://staticfiles.krxd.net/foss/docs/pypi/krux-stdlib/) for interacting with [Boto](http://boto.readthedocs.org/en/latest/)
+Krux Python class built on top of [Krux Stdlib](https://staticfiles.krxd.net/foss/docs/pypi/krux-stdlib/) for interacting with [Boto](http://boto.readthedocs.org/en/latest/) and [Boto3](http://boto3.readthedocs.org/en/latest/index.html)
 
 Application quick start
 -----------------------
@@ -19,7 +19,13 @@ def main():
     ### all that functionality as well.
     app = Application( name = 'krux-my-boto-script' )
 
-    ### This is the boto object, which behaves exactly like a standard
+    ### krux-boto supports both boto2 and boto3. See below for samples
+    ### using either interface
+    sample_boto2(app)
+    sample_boto3(app)
+
+def sample_boto2(app):
+    ### This is the boto2 object, which behaves exactly like a standard
     ### boto object, but with the right logging/stats settings added.
     boto = app.boto
 
@@ -31,11 +37,28 @@ def main():
     ec2 = app.boto.connect_ec2(region = region)
 
     ### Some simple diagnostics to show that it works
-    app.logger.warn('Connected to region: %s', region.name)
+    app.logger.warn('Boto2 - Connected to region: %s', region.name)
 
     for r in ec2.get_all_regions():
         app.logger.warn('Region: %s', r.name)
+        
+def sample_boto3(app):
+    ### This is the boto3 object, which behaves exactly like a standard
+    ### boto object, but with the right logging/stats settings added.
+    boto = app.boto3
 
+    ### This gets you an ec2 object, connected to the right region as
+    ### passed in via the cli or app directly
+    ec2 = boto.client('ec2')
+
+    ### Some simple diagnostics to show that it works
+    app.logger.warn('Boto3 - Connected to region: %s', boto.cli_region)
+
+    ### See here for docs/return values:
+    ### http://boto3.readthedocs.org/en/latest/reference/services/ec2.html#EC2.Client.describe_regions
+    for rv in ec2.describe_regions().get('Regions', []):
+        app.logger.warn('Region: %s', rv.get('RegionName'))
+    
 ### Run the application stand alone
 if __name__ == '__main__':
     main()

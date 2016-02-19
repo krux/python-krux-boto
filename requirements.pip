@@ -6,6 +6,8 @@ krux-stdlib==2.1.1
 
 # The library this is wrapping
 boto==2.39.0
+# Boto3 is out now as well, and we want to offer access to both
+boto3==1.2.3
 
 # Transient libraries
 # This is needed so there are no version conflicts when
