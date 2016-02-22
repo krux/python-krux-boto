@@ -334,6 +334,3 @@ class Boto3(BaseBoto):
 
 # Still inherit from BaseBoto, otherwise super().__init__ doesn't work
 #BaseBoto.register(Boto3)
-
-
-
