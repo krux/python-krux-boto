@@ -244,4 +244,3 @@ class BotoTest(unittest.TestCase):
 
         # Verify logging
         mock_logger.debug.assert_any_call('Calling wrapped boto attribute: %s on %s', 'client', self.boto)
-

@@ -287,6 +287,7 @@ class BaseBoto(object):
 
         return attr
 
+
 class Boto(BaseBoto):
 
     # All the hard work is done in the superclass. We just need to use the
@@ -304,7 +305,7 @@ class Boto(BaseBoto):
         get_logger('boto').setLevel(self._boto_log_level)
 
 # Still inherit from BaseBoto, otherwise super().__init__ doesn't work
-#BaseBoto.register(Boto)
+# BaseBoto.register(Boto)
 
 
 class Boto3(BaseBoto):
@@ -335,4 +336,4 @@ class Boto3(BaseBoto):
         get_logger('botocore').setLevel(self._boto_log_level)
 
 # Still inherit from BaseBoto, otherwise super().__init__ doesn't work
-#BaseBoto.register(Boto3)
+# BaseBoto.register(Boto3)
