@@ -163,7 +163,10 @@ class BotoTest(unittest.TestCase):
                 )
 
         for key, value in credential_map.iteritems():
-            msg = 'You set %s as {0} in CLI, but passed %s to the library. Please check README to make sure you are passing the credentials correctly'.format(value['msg'])
+            msg = 'You set %s as {0} in CLI, but passed %s to the library. ' \
+                'To avoid this error, consider using get_boto() function. ' \
+                'For more information, please check README.' \
+                .format(value['msg'])
             cli_key = value['CLI'][0:3] + '[...]' + value['CLI'][-3:]
             env_key = value['ENV'][0:3] + '[...]' + value['ENV'][-3:]
             mock_logger.warn.assert_any_call(msg, cli_key, env_key)

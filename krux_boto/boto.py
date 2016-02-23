@@ -190,7 +190,7 @@ class BaseBoto(object):
         if region is None:
             region = DEFAULT['region']()
 
-        # GOTCHA: Due to backward incompatible version change, the users of krux_boto may pass wrong credential
+        # GOTCHA: Due to backward incompatible version change in v1.0.0, the users of krux_boto may pass wrong credential
         # Make sure the passed credential via CLI is the same as one passed into this instance
         parser = get_parser(description=NAME)
         add_boto_cli_arguments(parser)
@@ -200,13 +200,15 @@ class BaseBoto(object):
         if _access_key is not None and _access_key != access_key:
             self._logger.warn(
                 'You set %s as boto-access-key in CLI, but passed %s to the library. '
-                'Please check README to make sure you are passing the credentials correctly',
+                'To avoid this error, consider using get_boto() function. '
+                'For more information, please check README.',
                 BaseBoto._hide_value(_access_key), BaseBoto._hide_value(access_key),
             )
         if _secret_key is not None and _secret_key != secret_key:
             self._logger.warn(
                 'You set %s as boto-secret-key in CLI, but passed %s to the library. '
-                'Please check README to make sure you are passing the credentials correctly',
+                'To avoid this error, consider using get_boto() function. '
+                'For more information, please check README.',
                 BaseBoto._hide_value(_secret_key), BaseBoto._hide_value(secret_key),
             )
 
