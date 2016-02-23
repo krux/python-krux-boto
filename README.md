@@ -134,7 +134,7 @@ class MyApplication( object ):
 * This info can also be found in `krux_boto.Boto.add_boto_cli_arguments`
 * All arguments are string
 
-### Updating from 0.0.6 to 1.0.0<a name="version-update"></a>
+### <a name="version-update"></a>Updating from 0.0.6 to 1.0.0
 
 In version 0.0.6, `krux_boto.Boto` object took an `argparse.ArgumentParser` object as an optional parameter for the constructor. This approach has been abandoned. `krux_boto.Boto` object now expects 4 parameters listed below. Therefore, following change is required to get your application working with version 1.0.0.
 
