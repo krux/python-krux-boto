@@ -29,7 +29,7 @@ from mock import MagicMock, patch
 import krux_boto.boto
 import krux.cli
 import krux.logging
-from krux_boto.boto import Boto, Boto3, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY
+from krux_boto.boto import Boto, Boto3, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY, NAME
 
 
 class BotoTest(unittest.TestCase):
@@ -96,7 +96,6 @@ class BotoTest(unittest.TestCase):
 
         # Mocking the os.environ dictionary as an empty dictionary
         with patch.dict('krux_boto.boto.os.environ', clear=True):
-            print krux_boto.boto.os.environ
             self.boto = Boto(
                 access_key=credential_map[ACCESS_KEY],
                 secret_key=credential_map[SECRET_KEY],
@@ -109,13 +108,68 @@ class BotoTest(unittest.TestCase):
 
         # Verify the warning is logged
         for key, val in credential_map.iteritems():
-            print mock_logger.debug.call_args_list
             mock_logger.debug.assert_any_call('Passed boto credentials is empty. Falling back to environment variable %s', key)
             self.assertTrue(('Setting boto credential %s to %s', key, '<empty>') not in mock_logger.debug.call_args_list)
             mock_logger.info.assert_any_call(
                 'Boto environment credential %s NOT explicitly set -- boto will look for a .boto file somewhere',
                 key,
             )
+
+    def test_cli_arguments_check(self):
+        """
+        Boto warns users correctly when CLI arguments and passed in credentials don't match.
+        """
+        credential_map = {
+            ACCESS_KEY: {
+                'CLI': 'ZYXWVUTSR',
+                'ENV': 'ABCDEFGHI',
+                'msg': 'boto-access-key',
+            },
+            SECRET_KEY: {
+                'CLI': '0Z9Y8X7W6V5U4T3S2R1',
+                'ENV': '1A2B3C4D5E6F7G8H9I0',
+                'msg': 'boto-secret-key',
+            },
+        }
+
+        # Mocking the parser to trigger the warning
+        parser = krux.cli.get_parser(description=NAME)
+        add_boto_cli_arguments(parser)
+        namespace = parser.parse_args([
+            '--boto-access-key', credential_map[ACCESS_KEY]['CLI'],
+            '--boto-secret-key', credential_map[SECRET_KEY]['CLI'],
+        ])
+        mock_parser = MagicMock(
+            return_value=MagicMock(
+                spec=ArgumentParser,
+                autospec=True,
+                _action_groups=[],
+                parse_args=MagicMock(return_value=namespace)
+            )
+        )
+
+        # Mocking the logger to check for calls later
+        mock_logger = MagicMock(spec=Logger, autospec=True)
+
+        mock_env = {
+            ACCESS_KEY: credential_map[ACCESS_KEY]['ENV'],
+            SECRET_KEY: credential_map[SECRET_KEY]['ENV'],
+        }
+
+        with patch.dict('krux_boto.boto.os.environ', mock_env, clear=True):
+            with patch('krux_boto.boto.get_parser', mock_parser):
+                self.boto = Boto(
+                    logger=mock_logger
+                )
+
+        for key, value in credential_map.iteritems():
+            msg = 'You set %s as {0} in CLI, but passed %s to the library. ' \
+                'To avoid this error, consider using get_boto() function. ' \
+                'For more information, please check README.' \
+                .format(value['msg'])
+            cli_key = value['CLI'][0:3] + '[...]' + value['CLI'][-3:]
+            env_key = value['ENV'][0:3] + '[...]' + value['ENV'][-3:]
+            mock_logger.warn.assert_any_call(msg, cli_key, env_key)
 
     def test_logging_level(self):
         """
@@ -190,4 +244,3 @@ class BotoTest(unittest.TestCase):
 
         # Verify logging
         mock_logger.debug.assert_any_call('Calling wrapped boto attribute: %s on %s', 'client', self.boto)
-

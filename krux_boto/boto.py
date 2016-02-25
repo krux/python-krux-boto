@@ -32,8 +32,6 @@ import boto.utils
 # Version3
 import boto3
 
-
-
 #
 # Internal libraries
 #
@@ -75,7 +73,7 @@ def get_boto(args=None, logger=None, stats=None):
     """
 
     if not args:
-        parser = get_parser()
+        parser = get_parser(description=NAME)
         add_boto_cli_arguments(parser)
         args = parser.parse_args()
 
@@ -94,6 +92,7 @@ def get_boto(args=None, logger=None, stats=None):
         stats=stats,
     )
 
+
 def get_boto3(args=None, logger=None, stats=None):
     """
     Return a usable Boto3 object without creating a class around it.
@@ -108,7 +107,7 @@ def get_boto3(args=None, logger=None, stats=None):
     """
 
     if not args:
-        parser = get_parser()
+        parser = get_parser(description=NAME)
         add_boto_cli_arguments(parser)
         args = parser.parse_args()
 
@@ -126,6 +125,7 @@ def get_boto3(args=None, logger=None, stats=None):
         logger=logger,
         stats=stats,
     )
+
 
 # Designed to be called from krux.cli, or programs inheriting from it
 def add_boto_cli_arguments(parser):
@@ -173,9 +173,7 @@ class BaseBoto(object):
         logger=None,
         stats=None,
     ):
-
-        # Because we're wrapping boto directly, use ___ as a prefix for
-        # all our variables, so we don't clash with anything public
+        # Private variables, not to be used outside this module
         self._name = NAME
         self._logger = logger or get_logger(self._name)
         self._stats = stats or get_stats(prefix=self._name)
@@ -191,6 +189,28 @@ class BaseBoto(object):
 
         if region is None:
             region = DEFAULT['region']()
+
+        # GOTCHA: Due to backward incompatible version change in v1.0.0, the users of krux_boto may pass wrong credential
+        # Make sure the passed credential via CLI is the same as one passed into this instance
+        parser = get_parser(description=NAME)
+        add_boto_cli_arguments(parser)
+        args = parser.parse_args()
+        _access_key = getattr(args, 'boto_access_key', None)
+        _secret_key = getattr(args, 'boto_secret_key', None)
+        if _access_key is not None and _access_key != access_key:
+            self._logger.warn(
+                'You set %s as boto-access-key in CLI, but passed %s to the library. '
+                'To avoid this error, consider using get_boto() function. '
+                'For more information, please check README.',
+                BaseBoto._hide_value(_access_key), BaseBoto._hide_value(access_key),
+            )
+        if _secret_key is not None and _secret_key != secret_key:
+            self._logger.warn(
+                'You set %s as boto-secret-key in CLI, but passed %s to the library. '
+                'To avoid this error, consider using get_boto() function. '
+                'For more information, please check README.',
+                BaseBoto._hide_value(_secret_key), BaseBoto._hide_value(secret_key),
+            )
 
         # Infer the loglevel, but set it as a property so the subclasses can
         # use it to set the loglevels on the loghandlers for their implementation
@@ -223,8 +243,7 @@ class BaseBoto(object):
 
                 # this way we can tell what credentials are being used,
                 # without dumping the whole secret into the logs
-                pp_val = val[0:3] + '[...]' + val[-3:]
-                self._logger.debug('Setting boto credential %s to %s', env_var, pp_val)
+                self._logger.debug('Setting boto credential %s to %s', env_var, BaseBoto._hide_value(val))
 
                 os.environ[env_var] = val
 
@@ -240,6 +259,10 @@ class BaseBoto(object):
                     'Boto environment credential %s NOT explicitly set ' +
                     '-- boto will look for a .boto file somewhere', env_var
                 )
+
+    @staticmethod
+    def _hide_value(value):
+        return value[0:3] + '[...]' + value[-3:]
 
     def __getattr__(self, attr):
         """Proxies calls to ``boto.*`` methods."""
@@ -264,6 +287,7 @@ class BaseBoto(object):
 
         return attr
 
+
 class Boto(BaseBoto):
 
     # All the hard work is done in the superclass. We just need to use the
@@ -281,7 +305,7 @@ class Boto(BaseBoto):
         get_logger('boto').setLevel(self._boto_log_level)
 
 # Still inherit from BaseBoto, otherwise super().__init__ doesn't work
-#BaseBoto.register(Boto)
+# BaseBoto.register(Boto)
 
 
 class Boto3(BaseBoto):
@@ -312,7 +336,4 @@ class Boto3(BaseBoto):
         get_logger('botocore').setLevel(self._boto_log_level)
 
 # Still inherit from BaseBoto, otherwise super().__init__ doesn't work
-#BaseBoto.register(Boto3)
-
-
-
+# BaseBoto.register(Boto3)
