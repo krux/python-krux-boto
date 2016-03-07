@@ -29,7 +29,7 @@ from mock import MagicMock, patch
 import krux_boto.boto
 import krux.cli
 import krux.logging
-from krux_boto.boto import Boto, Boto3, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY, NAME
+from krux_boto.boto import Boto, Boto3, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY
 
 
 class BotoTest(unittest.TestCase):
@@ -133,7 +133,7 @@ class BotoTest(unittest.TestCase):
         }
 
         # Mocking the parser to trigger the warning
-        parser = krux.cli.get_parser(description=NAME)
+        parser = krux.cli.get_parser()
         add_boto_cli_arguments(parser)
         namespace = parser.parse_args([
             '--boto-access-key', credential_map[ACCESS_KEY]['CLI'],
@@ -144,7 +144,7 @@ class BotoTest(unittest.TestCase):
                 spec=ArgumentParser,
                 autospec=True,
                 _action_groups=[],
-                parse_args=MagicMock(return_value=namespace)
+                parse_known_args=MagicMock(return_value=namespace)
             )
         )
 

@@ -10,6 +10,7 @@
 from __future__ import absolute_import
 import unittest
 from logging import Logger
+import sys
 
 #
 # Third party libraries
@@ -26,6 +27,7 @@ from mock import MagicMock, patch
 from krux.stats import DummyStatsClient
 from krux_boto.boto import Boto, Boto3, add_boto_cli_arguments, NAME
 from krux_boto.cli import Application, main
+from krux.cli import get_group
 
 
 class CLItest(unittest.TestCase):
@@ -83,3 +85,35 @@ class CLItest(unittest.TestCase):
 
         # Verify the mock sys.exit has been called
         mock_exit.assert_called_once_with(0)
+
+    @patch.object(sys, 'argv', ['prog', 'arg1'])
+    def test_inheritance(self):
+        """
+        krux_boto.cli.Application can be inherited properly
+        """
+        app = TestApplication()
+
+        # Check that TestApplication inherits krux_boto.cli.Application
+        self.assertIsInstance(app.boto, Boto)
+
+        # Check the test CLI argument is handled correctly
+        self.assertIn('test', app.args)
+        self.assertEqual('arg1', app.args.test)
+
+
+class TestApplication(Application):
+
+    def __init__(self):
+        # Call to the superclass to bootstrap.
+        super(TestApplication, self).__init__(name='fake-unit-test-application')
+
+    def add_cli_arguments(self, parser):
+        super(TestApplication, self).add_cli_arguments(parser)
+
+        group = get_group(parser, self.name)
+
+        group.add_argument(
+            'test',
+            type=str,
+            help='Purely exists for the unit test',
+        )

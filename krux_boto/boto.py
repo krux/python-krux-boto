@@ -73,7 +73,7 @@ def get_boto(args=None, logger=None, stats=None):
     """
 
     if not args:
-        parser = get_parser(description=NAME)
+        parser = get_parser()
         add_boto_cli_arguments(parser)
         args = parser.parse_args()
 
@@ -107,7 +107,7 @@ def get_boto3(args=None, logger=None, stats=None):
     """
 
     if not args:
-        parser = get_parser(description=NAME)
+        parser = get_parser()
         add_boto_cli_arguments(parser)
         args = parser.parse_args()
 
@@ -192,9 +192,11 @@ class BaseBoto(object):
 
         # GOTCHA: Due to backward incompatible version change in v1.0.0, the users of krux_boto may pass wrong credential
         # Make sure the passed credential via CLI is the same as one passed into this instance
-        parser = get_parser(description=NAME)
+        parser = get_parser()
         add_boto_cli_arguments(parser)
-        args = parser.parse_args()
+        # GOTCHA: We only care about the credential arguments and nothing else.
+        # Don't validate the arguments or parse other things. Let krux.cli do that.
+        args = parser.parse_known_args()
         _access_key = getattr(args, 'boto_access_key', None)
         _secret_key = getattr(args, 'boto_secret_key', None)
         if _access_key is not None and _access_key != access_key:
