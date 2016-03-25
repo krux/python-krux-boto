@@ -30,6 +30,8 @@ class SqsTest(unittest.TestCase):
         )
 
     def test_get_messages(self):
+        # TODO: This test needs to be improved using mock and stuff. But for the interest of time,
+        # let's leave it at this minimal state.
         messages = self._sqs.get_messages(self.TEST_QUEUE_NAME)
         self.assertIsInstance(messages, list)
 
