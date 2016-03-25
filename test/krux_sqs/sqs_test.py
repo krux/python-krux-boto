@@ -30,6 +30,9 @@ class SqsTest(unittest.TestCase):
         )
 
     def test_get_messages(self):
+        """
+        SQS messages are received and converted into dictionary correctly
+        """
         # TODO: This test needs to be improved using mock and stuff. But for the interest of time,
         # let's leave it at this minimal state.
         messages = self._sqs.get_messages(self.TEST_QUEUE_NAME)
@@ -47,3 +50,12 @@ class SqsTest(unittest.TestCase):
             self.assertIn('MessageAttributes', msg)
             self.assertIn('QueueUrl', msg)
             self.assertIn('Attributes', msg)
+
+    def test_delete_messages(self):
+        """
+        SQS messages can be deleted correctly
+        """
+        # TODO: This test needs to be improved using mock and stuff. But for the interest of time,
+        # let's leave it at this minimal state.
+        messages = self._sqs.get_messages(self.TEST_QUEUE_NAME)
+        self._sqs.delete_messages(self.TEST_QUEUE_NAME, messages)

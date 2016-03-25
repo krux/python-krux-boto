@@ -104,5 +104,8 @@ class Sqs(object):
 
         return result
 
-    def delete_messages(self, messages):
-        raise NotImplementedError()
+    def delete_messages(self, queue_name, messages):
+        if len(messages) > 0:
+            self._get_queue(queue_name).delete_messages(
+                Entries=[{'Id': msg['MessageId'], 'ReceiptHandle': msg['ReceiptHandle']} for msg in messages]
+            )
