@@ -18,12 +18,12 @@ import krux_boto.boto
 import krux_sqs.sqs
 
 
-class SqsBoto3Test(unittest.TestCase):
+class SqsTest(unittest.TestCase):
     TEST_REGION = 'us-west-2'
     TEST_QUEUE_NAME = 'jib-test'
 
     def setUp(self):
-        self._sqs = krux_sqs.sqs.SqsBoto3(
+        self._sqs = krux_sqs.sqs.Sqs(
             boto=krux_boto.boto.Boto3(
                 region=self.TEST_REGION
             )

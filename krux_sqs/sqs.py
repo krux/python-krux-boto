@@ -22,6 +22,7 @@ import simplejson
 
 from krux.logging import get_logger
 from krux.stats import get_stats
+from krux_boto.boto import Boto3
 
 
 NAME = 'krux-sqs'
@@ -36,8 +37,6 @@ def add_sqs_cli_arguments(parser):
 
 
 class Sqs(object):
-    __metaclass__ = ABCMeta
-
     MAX_RECEIVE_MESSAGES_NUM = 10
     MAX_RECEIVE_MESSAGES_WAIT = 10
 
@@ -52,28 +51,10 @@ class Sqs(object):
         self._logger = logger or get_logger(self._name)
         self._stats = stats or get_stats(prefix=self._name)
 
-        self._boto = boto
+        if not isinstance(boto, Boto3):
+            raise NotImplementedError('Currently krux_boto.sqs.Sqs only supports krux_boto.boto.Boto3')
 
-    @abstractmethod
-    def get_messages(self):
-        raise NotImplementedError()
-
-    @abstractmethod
-    def delete_messages(self, messages):
-        raise NotImplementedError()
-
-
-class SqsBoto2(Sqs):
-    pass
-
-
-class SqsBoto3(Sqs):
-
-    def __init__(self, *args, **kwargs):
-        # Call to the superclass to bootstrap.
-        super(SqsBoto3, self).__init__(*args, **kwargs)
-
-        self._resource = self._boto.resource('sqs')
+        self._resource = boto.resource('sqs')
         self._queues = {}
 
     def _get_queue(self, queue_name):
@@ -106,4 +87,4 @@ class SqsBoto3(Sqs):
         return result
 
     def delete_messages(self, messages):
-        pass
+        raise NotImplementedError()
