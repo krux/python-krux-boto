@@ -10,6 +10,19 @@
 from __future__ import absolute_import
 from abc import ABCMeta, abstractmethod
 
+#
+# Third party libraries
+#
+
+import simplejson
+
+#
+# Internal libraries
+#
+
+from krux.logging import get_logger
+from krux.stats import get_stats
+
 
 NAME = 'krux-sqs'
 
@@ -50,9 +63,47 @@ class Sqs(object):
         raise NotImplementedError()
 
 
-class Sqs_Boto2(Sqs):
+class SqsBoto2(Sqs):
     pass
 
 
-class Sqs_Boto3(Sqs):
-    pass
+class SqsBoto3(Sqs):
+
+    def __init__(self, *args, **kwargs):
+        # Call to the superclass to bootstrap.
+        super(SqsBoto3, self).__init__(*args, **kwargs)
+
+        self._resource = self._boto.resource('sqs')
+        self._queues = {}
+
+    def _get_queue(self, queue_name):
+        if queue_name not in self._queues or self._queues[queue_name] is None:
+            self._queues[queue_name] = self._resource.get_queue_by_name(QueueName=queue_name)
+
+        return self._queues[queue_name]
+
+    def get_messages(self, queue_name):
+        raw_messages = self._get_queue(queue_name).receive_messages(
+            MaxNumberOfMessages=self.MAX_RECEIVE_MESSAGES_NUM,
+            WaitTimeSeconds=self.MAX_RECEIVE_MESSAGES_WAIT
+        )
+
+        result = []
+        for msg in raw_messages:
+            body_dict = simplejson.loads(msg.body)
+            body_dict['Message'] = simplejson.loads(body_dict['Message'])
+
+            msg_dict = {
+                'ReceiptHandle': msg.receipt_handle,
+                'MessageId': msg.message_id,
+                'Body': body_dict,
+                'MessageAttributes': msg.message_attributes,
+                'QueueUrl': msg.queue_url,
+                'Attributes': msg.attributes,
+            }
+            result.append(msg_dict)
+
+        return result
+
+    def delete_messages(self, messages):
+        pass
