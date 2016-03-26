@@ -77,7 +77,7 @@ class Sqs(object):
         """
         Returns a list of messages in the given queue.
 
-        :param queue_name: :py:class:`str` Name of the queue to get.
+        :param queue_name: :py:class:`str` Name of the queue to get messages from.
         """
         # GOTCHA: Note that not all messages may be returned
         # http://boto3.readthedocs.org/en/latest/reference/services/sqs.html#SQS.Queue.receive_messages
@@ -105,6 +105,13 @@ class Sqs(object):
         return result
 
     def delete_messages(self, queue_name, messages):
+        """
+        Deletes the given list of messages from the given queue.
+
+        :param queue_name: :py:class:`str` Name of the queue to delete messages from.
+        :param messages: :py:class:`list` List of messages returned by get_messages().
+        """
+        # GOTCHA: queue.delete_messages() does not handle an empty list
         if len(messages) > 0:
             self._get_queue(queue_name).delete_messages(
                 Entries=[{'Id': msg['MessageId'], 'ReceiptHandle': msg['ReceiptHandle']} for msg in messages]
