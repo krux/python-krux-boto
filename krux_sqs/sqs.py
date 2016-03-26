@@ -22,7 +22,8 @@ import simplejson
 
 from krux.logging import get_logger
 from krux.stats import get_stats
-from krux_boto.boto import Boto3
+from krux.cli import get_group
+from krux_boto.boto import Boto3, add_boto_cli_arguments
 
 
 NAME = 'krux-sqs'
@@ -32,8 +33,19 @@ def get_sqs(args=None, logger=None, stats=None):
     pass
 
 
-def add_sqs_cli_arguments(parser):
-    pass
+def add_sqs_cli_arguments(parser, include_boto_arguments=True):
+    """
+    Utility function for adding SQS specific CLI arguments.
+    """
+    if include_boto_arguments:
+        # GOTCHA: Since many modules use krux_boto, the krux_boto's CLI arguments can be included twice,
+        # causing an error. This creates a way to circumvent that.
+
+        # Add all the boto arguments
+        add_boto_cli_arguments(parser)
+
+    # Add those specific to the application
+    group = get_group(parser, NAME)
 
 
 class Sqs(object):
