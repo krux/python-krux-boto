@@ -37,6 +37,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'boto',
+        'boto3',
         'krux-stdlib',
     ],
     entry_points={
