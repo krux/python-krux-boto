@@ -2,7 +2,7 @@
 --extra-index-url https://staticfiles.krxd.net/foss/pypi/
 
 # Krux' standard library, which this is built on
-krux-stdlib==2.1.1
+krux-stdlib==2.2.1
 
 # The library this is wrapping
 boto==2.39.0
@@ -27,6 +27,7 @@ GitPython==1.0.2
 simplejson==3.8.1
 tornado==4.3
 lockfile==0.12.2
+subprocess32==3.2.7
 async==0.6.2
 fudge==1.1.0
 gitdb==0.6.4
