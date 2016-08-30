@@ -10,6 +10,9 @@ boto==2.42.0
 boto3==1.4.0
 botocore==1.4.49
 
+# For RegionCode enum
+enum34=1.1.6
+
 # Transitive libraries
 # This is needed so there are no version conflicts when
 # one downstream library does NOT specify the version it wants,
