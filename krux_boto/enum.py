@@ -31,8 +31,16 @@ class RegionCode(Enum):
         self.code = code
         self.region = region
 
-    # def __call__(cls, value, *args, **kw):
-    #     if isinstance(value, str):
-    #         # map strings to enum values, defaults to Unknown
-    #         value = {'nl': 2, 'src': 1}.get(value, 0)
-    #     return super().__call__(value, *args, **kw)
+    # GOTCHA: It would be so nice if I can override __getitem__ function
+    # for this. However that is not possible with the current implementation.
+    # Thus, creating a class method for this.
+    @classmethod
+    def from_region(cls, region):
+        # Lower the
+        region = region.lower()
+
+        for enum in list(cls):
+            if enum.region == region:
+                return enum
+
+        raise KeyError(region)

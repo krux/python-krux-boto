@@ -60,3 +60,30 @@ class RegionCodeTest(unittest.TestCase):
         """
         for code in self.REGIONS.keys():
             self.assertEqual(self.REGIONS[code][1], RegionCode[code])
+
+    def test_get_by_code_error(self):
+        """
+        When asked for an invalid code, an error is thrown.
+        """
+        fake_code = 'fake-code'
+        with self.assertRaises(KeyError) as e:
+            RegionCode[fake_code]
+
+        self.assertEqual("'{0}'".format(fake_code), str(e.exception))
+
+    def test_from_region(self):
+        """
+        Enums can be retrieved by region names ('us-east-1', 'us-west-2', etc)
+        """
+        for region, enum in self.REGIONS.values():
+            self.assertEqual(enum, RegionCode.from_region(region))
+
+    def test_from_region_error(self):
+        """
+        When asked for an invalid region, an error is thrown.
+        """
+        fake_region = 'fake-region'
+        with self.assertRaises(KeyError) as e:
+            RegionCode.from_region(fake_region)
+
+        self.assertEqual("'{0}'".format(fake_region), str(e.exception))
