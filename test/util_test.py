@@ -23,7 +23,7 @@ from mock import MagicMock, patch
 #
 
 from krux_boto import get_instance_region, Error
-from krux_boto.util import RegionCode, Region, RegionToCode
+from krux_boto.util import RegionCode
 
 
 class UtilTest(unittest.TestCase):
@@ -73,86 +73,86 @@ class UtilTest(unittest.TestCase):
 
 class RegionCodeTest(unittest.TestCase):
     REGIONS = {
-        RegionCode.ASH: Region.us_east_1,
-        RegionCode.PDX: Region.us_west_2,
-        RegionCode.DUB: Region.eu_west_1,
-        RegionCode.SIN: Region.ap_southeast_1,
-        Region.us_east_1: RegionCode.ASH,
-        Region.us_west_2: RegionCode.PDX,
-        Region.eu_west_1: RegionCode.DUB,
-        Region.ap_southeast_1: RegionCode.SIN,
+        RegionCode.Code.ASH: RegionCode.Region.us_east_1,
+        RegionCode.Code.PDX: RegionCode.Region.us_west_2,
+        RegionCode.Code.DUB: RegionCode.Region.eu_west_1,
+        RegionCode.Code.SIN: RegionCode.Region.ap_southeast_1,
+        RegionCode.Region.us_east_1: RegionCode.Code.ASH,
+        RegionCode.Region.us_west_2: RegionCode.Code.PDX,
+        RegionCode.Region.eu_west_1: RegionCode.Code.DUB,
+        RegionCode.Region.ap_southeast_1: RegionCode.Code.SIN,
     }
 
     def test_iter(self):
         """
-        RegionToCode.__iter__() is correctly set up and iterates through the dictionary.
+        RegionCode.__iter__() is correctly set up and iterates through the dictionary.
         """
-        for key, value in RegionToCode.iteritems():
+        for key, value in RegionCode.iteritems():
             self.assertEquals(self.REGIONS[key], value)
 
     def test_len(self):
         """
-        RegionToCode.__len__() is correctly set up and returns the length the dictionary.
+        RegionCode.__len__() is correctly set up and returns the length the dictionary.
         """
-        self.assertEquals(len(self.REGIONS), len(RegionToCode))
+        self.assertEquals(len(self.REGIONS), len(RegionCode))
 
     def test_get_by_code(self):
         """
-        Region can be correctly retrieved from Code using RegionToCode.
+        Region can be correctly retrieved from Code using RegionCode.
         """
-        for code in list(RegionCode):
-            self.assertEquals(self.REGIONS[code], RegionToCode[code])
+        for code in list(RegionCode.Code):
+            self.assertEquals(self.REGIONS[code], RegionCode[code])
 
     def test_get_by_region(self):
         """
-        Code can be correctly retrieved from Region using RegionToCode.
+        Code can be correctly retrieved from Region using RegionCode.
         """
-        for reg in list(Region):
-            self.assertEquals(self.REGIONS[reg], RegionToCode[reg])
+        for reg in list(RegionCode.Region):
+            self.assertEquals(self.REGIONS[reg], RegionCode[reg])
 
     def test_get_by_code_str(self):
         """
-        Region can be correctly retrieved from Code string using RegionToCode.
+        Region can be correctly retrieved from Code string using RegionCode.
         """
-        for code in list(RegionCode):
-            self.assertEquals(self.REGIONS[code], RegionToCode[code.name])
+        for code in list(RegionCode.Code):
+            self.assertEquals(self.REGIONS[code], RegionCode[code.name])
 
     def test_get_by_code_str_lower(self):
         """
-        Region can be correctly retrieved from Code string using RegionToCode, regardless of the case
+        Region can be correctly retrieved from Code string using RegionCode, regardless of the case
         """
-        for code in list(RegionCode):
-            self.assertEquals(self.REGIONS[code], RegionToCode[code.name.lower()])
+        for code in list(RegionCode.Code):
+            self.assertEquals(self.REGIONS[code], RegionCode[code.name.lower()])
 
     def test_get_by_region_str(self):
         """
-        Code can be correctly retrieved from Region string using RegionToCode.
+        Code can be correctly retrieved from Region string using RegionCode.
         """
-        for reg in list(Region):
-            self.assertEquals(self.REGIONS[reg], RegionToCode[reg.name])
+        for reg in list(RegionCode.Region):
+            self.assertEquals(self.REGIONS[reg], RegionCode[reg.name])
 
     def test_get_by_region_str_uppder(self):
         """
-        Code can be correctly retrieved from Region string using RegionToCode, regardless of the case
+        Code can be correctly retrieved from Region string using RegionCode, regardless of the case
         """
-        for reg in list(Region):
-            self.assertEquals(self.REGIONS[reg], RegionToCode[reg.name.upper()])
+        for reg in list(RegionCode.Region):
+            self.assertEquals(self.REGIONS[reg], RegionCode[reg.name.upper()])
 
     def test_get_by_region_name(self):
         """
-        Code can be correctly retrieved from Region string with dashes using RegionToCode.
+        Code can be correctly retrieved from Region string with dashes using RegionCode.
         """
-        for reg in list(Region):
+        for reg in list(RegionCode.Region):
             reg_str = reg.name.replace('_', '-')
 
-            self.assertEquals(self.REGIONS[reg], RegionToCode[reg_str])
+            self.assertEquals(self.REGIONS[reg], RegionCode[reg_str])
 
     def test_get_error(self):
         """
-        Given an invalid key, RegionToCode throws error
+        Given an invalid key, RegionCode throws error
         """
         fake_key = 'foobar'
         with self.assertRaises(KeyError) as e:
-            RegionToCode[fake_key]
+            RegionCode[fake_key]
 
         self.assertEquals("'{0}'".format(fake_key), str(e.exception))

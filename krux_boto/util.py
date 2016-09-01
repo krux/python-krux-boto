@@ -44,29 +44,27 @@ def get_instance_region():
 
 
 # Region codes
-class RegionCode(Enum):
-    ASH = 1
-    PDX = 2
-    DUB = 3
-    SIN = 4
+class __RegionCode(Mapping):
+    class Code(Enum):
+        ASH = 1
+        PDX = 2
+        DUB = 3
+        SIN = 4
 
+    class Region(Enum):
+        us_east_1 = 1
+        us_west_2 = 2
+        eu_west_1 = 3
+        ap_southeast_1 = 4
 
-class Region(Enum):
-    us_east_1 = 1
-    us_west_2 = 2
-    eu_west_1 = 3
-    ap_southeast_1 = 4
-
-
-class __RegionToCode(Mapping):
     def __init__(self):
         self._wrapped = {}
 
-        for code in list(RegionCode):
-            self._wrapped[code] = Region(code.value)
+        for code in list(self.Code):
+            self._wrapped[code] = self.Region(code.value)
 
-        for reg in list(Region):
-            self._wrapped[reg] = RegionCode(reg.value)
+        for reg in list(self.Region):
+            self._wrapped[reg] = self.Code(reg.value)
 
     def __iter__(self):
         return iter(self._wrapped)
@@ -75,19 +73,19 @@ class __RegionToCode(Mapping):
         return len(self._wrapped)
 
     def __getitem__(self, key):
-        if isinstance(key, Region) or isinstance(key, RegionCode):
+        if isinstance(key, self.Region) or isinstance(key, self.Code):
             return self._wrapped[key]
         elif isinstance(key, str):
             key = key.replace('-', '_')
 
-            code = getattr(RegionCode, key.upper(), None)
+            code = getattr(self.Code, key.upper(), None)
             if code is not None:
                 return self._wrapped[code]
 
-            reg = getattr(Region, key.lower(), None)
+            reg = getattr(self.Region, key.lower(), None)
             if reg is not None:
                 return self._wrapped[reg]
 
         raise KeyError(key)
 
-RegionToCode = __RegionToCode()
+RegionCode = __RegionCode()
