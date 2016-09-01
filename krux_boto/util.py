@@ -9,6 +9,7 @@
 
 from __future__ import absolute_import
 import string
+from collections import Mapping
 
 #
 # Third party libraries
@@ -44,25 +45,49 @@ def get_instance_region():
 
 # Region codes
 class RegionCode(Enum):
-    ASH = ('ASH', 'us-east-1')
-    PDX = ('PDX', 'us-west-2')
-    DUB = ('DUB', 'eu-west-1')
-    SIN = ('SIN', 'ap-southeast-1')
+    ASH = 1
+    PDX = 2
+    DUB = 3
+    SIN = 4
 
-    def __init__(self, code, region):
-        self.code = code
-        self.region = region
 
-    # GOTCHA: It would be so nice if I can override __getitem__ function
-    # for this. However that is not possible with the current implementation.
-    # Thus, creating a class method for this.
-    @classmethod
-    def from_region(cls, region):
-        # Lower the
-        region = region.lower()
+class Region(Enum):
+    us_east_1 = 1
+    us_west_2 = 2
+    eu_west_1 = 3
+    ap_southeast_1 = 4
 
-        for enum in list(cls):
-            if enum.region == region:
-                return enum
 
-        raise KeyError(region)
+class __RegionToCode(Mapping):
+    def __init__(self):
+        self._wrapped = {}
+
+        for code in list(RegionCode):
+            self._wrapped[code] = Region(code.value)
+
+        for reg in list(Region):
+            self._wrapped[reg] = RegionCode(reg.value)
+
+    def __iter__(self):
+        return iter(self._wrapped)
+
+    def __len__(self):
+        return len(self._wrapped)
+
+    def __getitem__(self, key):
+        if isinstance(key, Region) or isinstance(key, RegionCode):
+            return self._wrapped[key]
+        elif isinstance(key, str):
+            key = key.replace('-', '_')
+
+            code = getattr(RegionCode, key.upper(), None)
+            if code is not None:
+                return self._wrapped[code]
+
+            reg = getattr(Region, key.lower(), None)
+            if reg is not None:
+                return self._wrapped[reg]
+
+        raise KeyError(key)
+
+RegionToCode = __RegionToCode()

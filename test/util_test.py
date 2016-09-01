@@ -23,7 +23,7 @@ from mock import MagicMock, patch
 #
 
 from krux_boto import get_instance_region, Error
-from krux_boto.util import RegionCode
+from krux_boto.util import RegionCode, Region, RegionToCode
 
 
 class UtilTest(unittest.TestCase):
@@ -73,66 +73,86 @@ class UtilTest(unittest.TestCase):
 
 class RegionCodeTest(unittest.TestCase):
     REGIONS = {
-        'ASH': ('us-east-1', RegionCode.ASH),
-        'PDX': ('us-west-2', RegionCode.PDX),
-        'DUB': ('eu-west-1', RegionCode.DUB),
-        'SIN': ('ap-southeast-1', RegionCode.SIN),
+        RegionCode.ASH: Region.us_east_1,
+        RegionCode.PDX: Region.us_west_2,
+        RegionCode.DUB: Region.eu_west_1,
+        RegionCode.SIN: Region.ap_southeast_1,
+        Region.us_east_1: RegionCode.ASH,
+        Region.us_west_2: RegionCode.PDX,
+        Region.eu_west_1: RegionCode.DUB,
+        Region.ap_southeast_1: RegionCode.SIN,
     }
 
-    def test_names(self):
+    def test_iter(self):
         """
-        ASH, PDX, DUB, and SIN are all defined
+        RegionToCode.__iter__() is correctly set up and iterates through the dictionary.
         """
-        region_codes = [rc.name for rc in list(RegionCode)]
-        for code in self.REGIONS.keys():
-            self.assertIn(code, region_codes)
+        for key, value in RegionToCode.iteritems():
+            self.assertEquals(self.REGIONS[key], value)
 
-    def test_codes(self):
+    def test_len(self):
         """
-        Enums have the correct code property defined
+        RegionToCode.__len__() is correctly set up and returns the length the dictionary.
         """
-        region_codes = [rc.code for rc in list(RegionCode)]
-        for code in self.REGIONS.keys():
-            self.assertIn(code, region_codes)
-
-    def test_regions(self):
-        """
-        Enums have the correct region property defined
-        """
-        region_codes = [rc.region for rc in list(RegionCode)]
-        for region in [r for r, e in self.REGIONS.values()]:
-            self.assertIn(region, region_codes)
+        self.assertEquals(len(self.REGIONS), len(RegionToCode))
 
     def test_get_by_code(self):
         """
-        Enums can be retrieved by region code (ASH, PDX, DUB, SIN)
+        Region can be correctly retrieved from Code using RegionToCode.
         """
-        for code in self.REGIONS.keys():
-            self.assertEqual(self.REGIONS[code][1], RegionCode[code])
+        for code in list(RegionCode):
+            self.assertEquals(self.REGIONS[code], RegionToCode[code])
 
-    def test_get_by_code_error(self):
+    def test_get_by_region(self):
         """
-        When asked for an invalid code, an error is thrown.
+        Code can be correctly retrieved from Region using RegionToCode.
         """
-        fake_code = 'fake-code'
+        for reg in list(Region):
+            self.assertEquals(self.REGIONS[reg], RegionToCode[reg])
+
+    def test_get_by_code_str(self):
+        """
+        Region can be correctly retrieved from Code string using RegionToCode.
+        """
+        for code in list(RegionCode):
+            self.assertEquals(self.REGIONS[code], RegionToCode[code.name])
+
+    def test_get_by_code_str_lower(self):
+        """
+        Region can be correctly retrieved from Code string using RegionToCode, regardless of the case
+        """
+        for code in list(RegionCode):
+            self.assertEquals(self.REGIONS[code], RegionToCode[code.name.lower()])
+
+    def test_get_by_region_str(self):
+        """
+        Code can be correctly retrieved from Region string using RegionToCode.
+        """
+        for reg in list(Region):
+            self.assertEquals(self.REGIONS[reg], RegionToCode[reg.name])
+
+    def test_get_by_region_str_uppder(self):
+        """
+        Code can be correctly retrieved from Region string using RegionToCode, regardless of the case
+        """
+        for reg in list(Region):
+            self.assertEquals(self.REGIONS[reg], RegionToCode[reg.name.upper()])
+
+    def test_get_by_region_name(self):
+        """
+        Code can be correctly retrieved from Region string with dashes using RegionToCode.
+        """
+        for reg in list(Region):
+            reg_str = reg.name.replace('_', '-')
+
+            self.assertEquals(self.REGIONS[reg], RegionToCode[reg_str])
+
+    def test_get_error(self):
+        """
+        Given an invalid key, RegionToCode throws error
+        """
+        fake_key = 'foobar'
         with self.assertRaises(KeyError) as e:
-            RegionCode[fake_code]
+            RegionToCode[fake_key]
 
-        self.assertEqual("'{0}'".format(fake_code), str(e.exception))
-
-    def test_from_region(self):
-        """
-        Enums can be retrieved by region names ('us-east-1', 'us-west-2', etc)
-        """
-        for region, enum in self.REGIONS.values():
-            self.assertEqual(enum, RegionCode.from_region(region))
-
-    def test_from_region_error(self):
-        """
-        When asked for an invalid region, an error is thrown.
-        """
-        fake_region = 'fake-region'
-        with self.assertRaises(KeyError) as e:
-            RegionCode.from_region(fake_region)
-
-        self.assertEqual("'{0}'".format(fake_region), str(e.exception))
+        self.assertEquals("'{0}'".format(fake_key), str(e.exception))
