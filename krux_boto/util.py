@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# © 2015 Krux Digital, Inc.
+# © 2015-2016 Krux Digital, Inc.
 #
 
 #
@@ -9,12 +9,14 @@
 
 from __future__ import absolute_import
 import string
+from collections import Mapping
 
 #
 # Third party libraries
 #
 
 import boto.utils
+from enum import Enum
 
 #
 # Internal libraries
@@ -39,3 +41,58 @@ def get_instance_region():
         get_logger('krux_boto').warn('get_instance_region failed to get the local instance region')
         raise Error('get_instance_region failed to get the local instance region')
     return zone.rstrip(string.lowercase)
+
+
+# Region codes
+class __RegionCode(Mapping):
+
+    # GOTCHA: The dictionary is created by matching the values.
+    # Therefore, when adding a region, make sure the values of the enums match.
+    # i.e. If we add LA as one of the regions, then Region.LA.value == Code.LAX.value
+    class Code(Enum):
+        ASH = 1
+        PDX = 2
+        DUB = 3
+        SIN = 4
+
+    class Region(Enum):
+        us_east_1 = 1
+        us_west_2 = 2
+        eu_west_1 = 3
+        ap_southeast_1 = 4
+
+        def __str__(self):
+            return self.name.lower().replace('_', '-')
+
+    def __init__(self):
+        self._wrapped = {}
+
+        for code in list(self.Code):
+            self._wrapped[code] = self.Region(code.value)
+
+        for reg in list(self.Region):
+            self._wrapped[reg] = self.Code(reg.value)
+
+    def __iter__(self):
+        return iter(self._wrapped)
+
+    def __len__(self):
+        return len(self._wrapped)
+
+    def __getitem__(self, key):
+        if isinstance(key, self.Region) or isinstance(key, self.Code):
+            return self._wrapped[key]
+        elif isinstance(key, str):
+            key = key.replace('-', '_')
+
+            code = getattr(self.Code, key.upper(), None)
+            if code is not None:
+                return self._wrapped[code]
+
+            reg = getattr(self.Region, key.lower(), None)
+            if reg is not None:
+                return self._wrapped[reg]
+
+        raise KeyError(key)
+
+RegionCode = __RegionCode()
