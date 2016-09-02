@@ -45,6 +45,10 @@ def get_instance_region():
 
 # Region codes
 class __RegionCode(Mapping):
+
+    # GOTCHA: The dictionary is created by matching the values.
+    # Therefore, when adding a region, make sure the values of the enums match.
+    # i.e. If we add LA as one of the regions, then Region.LA.value == Code.LAX.value
     class Code(Enum):
         ASH = 1
         PDX = 2
