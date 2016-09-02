@@ -46,7 +46,7 @@ def sample_boto2(app):
 
     for r in ec2.get_all_regions():
         app.logger.warn('Region: %s', r.name)
-        
+
 def sample_boto3(app):
     ### This is the boto3 object, which behaves exactly like a standard
     ### boto object, but with the right logging/stats settings added.
@@ -63,7 +63,7 @@ def sample_boto3(app):
     ### http://boto3.readthedocs.org/en/latest/reference/services/ec2.html#EC2.Client.describe_regions
     for rv in ec2.describe_regions().get('Regions', []):
         app.logger.warn('Region: %s', rv.get('RegionName'))
-    
+
 ### Run the application stand alone
 if __name__ == '__main__':
     main()
@@ -149,12 +149,12 @@ class Application(krux.cli.Application):
 
     def __init__(self, name='krux-my-boto-script'):
         super(Application, self).__init__(name=name)
-        
+
         self.boto = Boto()
-        
+
     def add_cli_arguments(self, parser):
         super(Application, self).add_cli_arguments(parser)
-        
+
         add_boto_cli_arguments(parser)
 
 ```
@@ -169,13 +169,13 @@ class Application(krux.cli.Application):
 
     def __init__(self, name='krux-my-boto-script'):
         super(Application, self).__init__(name=name)
-        
+
         # Notice the change in constructor parameters
         self.boto = get_boto()
-        
+
     def add_cli_arguments(self, parser):
         super(Application, self).add_cli_arguments(parser)
-        
+
         add_boto_cli_arguments(parser)
 
 ```
@@ -237,4 +237,42 @@ boto:
                         ENV[AWS_SECRET_ACCESS_KEY]
   --boto-region {us-east-1,cn-north-1,ap-northeast-1,eu-west-1,ap-southeast-1,ap-southeast-2,us-west-2,us-gov-west-1,us-west-1,sa-east-1}
                         EC2 Region to connect to. (default: us-east-1)
+```
+
+krux_boto.util.RegionCode
+-------------------------
+
+`RegionCode` class is a dictionary between two enums, `RegionCode.Code` and `RegionCode.Region`. The enums represent Krux designated code and AWS region, respectively. The enums give a central location where the regions and the codes are defined. `RegionCode` class provides a quick lookup between the codes and the regions.
+
+The following code is a simple demonstration of how `RegionCode` class can be used.
+
+```python
+
+import krux_boto.cli
+from krux_boto.util import RegionCode
+
+
+class Application(krux_boto.cli.Application):
+
+    def run(self):
+        for region in RegionCode.Region:
+            conn = self.boto.ec2.connect_to_region(str(region))
+
+            clusters = {}
+
+            for instance in conn.get_only_instances():
+                cluster = instance.tags.get('cluster_name', None)
+
+                if cluster is None:
+                    continue
+                elif cluster not in clusters:
+                    clusters[cluster] = 0
+
+                clusters[cluster] += 1
+
+            for cluster, count in clusters.iteritems():
+                stats_code = '.'.join([RegionCode[region].name, cluster])
+                self.logger.info('Cluster %s: %d', stats_code, count)
+                self.stats.gauge(stats_code, count)
+
 ```
