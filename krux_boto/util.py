@@ -57,6 +57,9 @@ class __RegionCode(Mapping):
         eu_west_1 = 3
         ap_southeast_1 = 4
 
+        def __str__(self):
+            return self.name.lower().replace('_', '-')
+
     def __init__(self):
         self._wrapped = {}
 
