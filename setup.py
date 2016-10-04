@@ -36,9 +36,15 @@ setup(
     license='All Rights Reserved.',
     packages=find_packages(),
     install_requires=[
+        'krux-stdlib',
         'boto',
         'boto3',
-        'krux-stdlib',
+        'enum34',
+    ],
+    tests_require=[
+        'coverage',
+        'mock',
+        'nose',
     ],
     entry_points={
         'console_scripts': [
