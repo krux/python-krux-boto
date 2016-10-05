@@ -47,22 +47,30 @@ def get_instance_region():
 class __RegionCode(Mapping):
 
     # GOTCHA: The dictionary is created by matching the values.
-    # Therefore, when adding a region, make sure the values of the enums match.
-    # i.e. If we add LA as one of the regions, then Region.LA.value == Code.LAX.value
+    #         Therefore, when adding a region, make sure the values of the enums match.
+    #         i.e. If we add LA as one of the regions, then Region.LA.value == Code.LAX.value.
     class Code(Enum):
-        ASH = 1
-        PDX = 2
-        DUB = 3
-        SIN = 4
-        BOM = 5
-        SYN = 6
-        FRA = 7
-        NRT = 8
-        ICN = 9
-        GRU = 10
-        SFO = 11
+        """
+        Krux uses the largest airport in the region for the codename of AWS region.
+        This enum is the representation of that.
+        """
+        # Use IATA codes since they sound closer to the colloquial airport names
+        ASH = 1   # Ashburn, Virginia
+        PDX = 2   # Portland, Oregon
+        DUB = 3   # Dublin, Ireland
+        SIN = 4   # Singapore
+        BOM = 5   # Mumbai (Bombay), India
+        SYN = 6   # Sydney, Australia
+        FRA = 7   # Frankfurt, Germany
+        NRT = 8   # Tokyo (Narita), Japan
+        ICN = 9   # Seoul (Incheon), South Korea
+        GRU = 10  # Sao Paulo (Guarulhos), Brazil
+        SFO = 11  # San Francisco, California
 
     class Region(Enum):
+        """
+        Names of AWS regions as an enum.
+        """
         us_east_1 = 1
         us_west_2 = 2
         eu_west_1 = 3
