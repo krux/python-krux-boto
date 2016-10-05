@@ -16,8 +16,6 @@ import sys
 # Third party libraries
 #
 
-import boto
-from argparse import ArgumentParser
 from mock import MagicMock, patch, call
 
 #
@@ -25,7 +23,7 @@ from mock import MagicMock, patch, call
 #
 
 from krux.stats import DummyStatsClient
-from krux_boto.boto import Boto, Boto3, add_boto_cli_arguments, NAME
+from krux_boto.boto import Boto, Boto3, NAME
 from krux_boto.cli import Application, main
 from krux.cli import get_group
 from krux_boto.util import RegionCode
