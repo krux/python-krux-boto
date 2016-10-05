@@ -54,12 +54,26 @@ class __RegionCode(Mapping):
         PDX = 2
         DUB = 3
         SIN = 4
+        BOM = 5
+        SYN = 6
+        FRA = 7
+        NRT = 8
+        ICN = 9
+        GRU = 10
+        SFO = 11
 
     class Region(Enum):
         us_east_1 = 1
         us_west_2 = 2
         eu_west_1 = 3
         ap_southeast_1 = 4
+        ap_south_1 = 5
+        ap_southeast_2 = 6
+        eu_central_1 = 7
+        ap_northeast_1 = 8
+        ap_northeast_2 = 9
+        sa_east_1 = 10
+        us_west_1 = 11
 
         def __str__(self):
             return self.name.lower().replace('_', '-')
@@ -72,6 +86,10 @@ class __RegionCode(Mapping):
 
         for reg in list(self.Region):
             self._wrapped[reg] = self.Code(reg.value)
+
+        # HACK!
+        for name, region in self.Region._member_map_.iteritems():
+            self.Region._member_map_[name.lower().replace('_', '-')] = region
 
     def __iter__(self):
         return iter(self._wrapped)
