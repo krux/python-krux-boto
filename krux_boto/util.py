@@ -87,7 +87,10 @@ class __RegionCode(Mapping):
         for reg in list(self.Region):
             self._wrapped[reg] = self.Code(reg.value)
 
-        # HACK!
+        # HACK: Enum does not allow us to override its __getitem__() method.
+        #       Thus, we cannot handle the difference of underscore and dash gracefully.
+        #       However, since __getitem__() is merely a lookup of _member_map_ dictionary, duplicate the elements
+        #       in the private dictionary so that we can handle AWS region <-> RegionCode.Region conversion smoothly.
         for name, region in self.Region._member_map_.iteritems():
             self.Region._member_map_[name.lower().replace('_', '-')] = region
 
