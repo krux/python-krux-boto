@@ -65,7 +65,7 @@ class __RegionCode(Mapping):
         NRT = 8   # Tokyo (Narita), Japan
         ICN = 9   # Seoul (Incheon), South Korea
         GRU = 10  # Sao Paulo (Guarulhos), Brazil
-        SFO = 11  # San Francisco, California
+        SJC = 11  # San Jose, California
 
     class Region(Enum):
         """
