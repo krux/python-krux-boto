@@ -47,19 +47,41 @@ def get_instance_region():
 class __RegionCode(Mapping):
 
     # GOTCHA: The dictionary is created by matching the values.
-    # Therefore, when adding a region, make sure the values of the enums match.
-    # i.e. If we add LA as one of the regions, then Region.LA.value == Code.LAX.value
+    #         Therefore, when adding a region, make sure the values of the enums match.
+    #         i.e. If we add LA as one of the regions, then Region.LA.value == Code.LAX.value.
     class Code(Enum):
-        ASH = 1
-        PDX = 2
-        DUB = 3
-        SIN = 4
+        """
+        Krux uses the largest airport in the region for the codename of AWS region.
+        This enum is the representation of that.
+        """
+        # Use IATA codes since they sound closer to the colloquial airport names
+        ASH = 1   # Ashburn, Virginia
+        PDX = 2   # Portland, Oregon
+        DUB = 3   # Dublin, Ireland
+        SIN = 4   # Singapore
+        BOM = 5   # Mumbai (Bombay), India
+        SYN = 6   # Sydney, Australia
+        FRA = 7   # Frankfurt, Germany
+        NRT = 8   # Tokyo (Narita), Japan
+        ICN = 9   # Seoul (Incheon), South Korea
+        GRU = 10  # Sao Paulo (Guarulhos), Brazil
+        SJC = 11  # San Jose, California
 
     class Region(Enum):
+        """
+        Names of AWS regions as an enum.
+        """
         us_east_1 = 1
         us_west_2 = 2
         eu_west_1 = 3
         ap_southeast_1 = 4
+        ap_south_1 = 5
+        ap_southeast_2 = 6
+        eu_central_1 = 7
+        ap_northeast_1 = 8
+        ap_northeast_2 = 9
+        sa_east_1 = 10
+        us_west_1 = 11
 
         def __str__(self):
             return self.name.lower().replace('_', '-')
@@ -72,6 +94,13 @@ class __RegionCode(Mapping):
 
         for reg in list(self.Region):
             self._wrapped[reg] = self.Code(reg.value)
+
+        # HACK: Enum does not allow us to override its __getitem__() method.
+        #       Thus, we cannot handle the difference of underscore and dash gracefully.
+        #       However, since __getitem__() is merely a lookup of _member_map_ dictionary, duplicate the elements
+        #       in the private dictionary so that we can handle AWS region <-> RegionCode.Region conversion smoothly.
+        for name, region in self.Region._member_map_.iteritems():
+            self.Region._member_map_[name.lower().replace('_', '-')] = region
 
     def __iter__(self):
         return iter(self._wrapped)

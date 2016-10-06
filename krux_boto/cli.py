@@ -22,6 +22,7 @@ import boto
 
 import krux.cli
 from krux_boto.boto import add_boto_cli_arguments, get_boto, get_boto3, NAME
+from krux_boto.util import RegionCode
 
 
 class Application(krux.cli.Application):
@@ -45,22 +46,21 @@ class Application(krux.cli.Application):
         self._sample_boto3()
 
     def _sample_boto2(self):
-        region = self.boto.ec2.get_region(self.boto.cli_region)
-        ec2 = self.boto.connect_ec2(region=region)
-
-        self.logger.warn('Connected to region via boto2: %s', region.name)
-        for r in ec2.get_all_regions():
-            self.logger.warn('Region: %s', r.name)
+        self.logger.warn('Getting regions via boto2')
+        for r in self.boto.get_valid_regions():
+            if isinstance(r, RegionCode.Region):
+                self.logger.warn('Region: %s - %s', RegionCode[r].name, str(r))
+            else:
+                self.logger.warn('Region: %s', r)
 
     def _sample_boto3(self):
-        ec2 = self.boto3.client('ec2')
+        self.logger.warn('Getting regions via boto3')
+        for r in self.boto3.get_valid_regions():
+            if isinstance(r, RegionCode.Region):
+                self.logger.warn('Region: %s - %s', RegionCode[r].name, str(r))
+            else:
+                self.logger.warn('Region: %s', r)
 
-        self.logger.warn('Connected to region via boto3: %s', self.boto3.cli_region)
-
-        # See here for docs/return values:
-        # http://boto3.readthedocs.org/en/latest/reference/services/ec2.html#EC2.Client.describe_regions
-        for rv in ec2.describe_regions().get('Regions', []):
-            self.logger.warn('Region: %s', rv.get('RegionName'))
 
 def main():
     app = Application()

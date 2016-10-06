@@ -8,12 +8,11 @@
 #
 
 from __future__ import absolute_import
-from pprint import pprint
 from functools import wraps
 
 # Declare the baseboto class a metaclass to avoid
 # it being used directly
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 
 import os
 
@@ -39,6 +38,7 @@ import boto3
 from krux.logging import get_logger, LEVELS, DEFAULT_LOG_LEVEL
 from krux.stats import get_stats
 from krux.cli import get_parser, get_group
+from krux_boto.util import RegionCode
 
 
 # Constants
@@ -289,6 +289,17 @@ class BaseBoto(object):
 
         return attr
 
+    @abstractmethod
+    def get_valid_regions(self):
+        """
+        Gets all AWS regions that Krux can access
+
+        :return: A list of :py:class:`RegionCode.Region` for the known regions. For any new regions
+                 for which the enum does not exist, just returns the name of the region as a string.
+        :rtype: list[RegionCode.Region]
+        """
+        pass
+
 
 class Boto(BaseBoto):
 
@@ -306,9 +317,24 @@ class Boto(BaseBoto):
         # This sets the log level for the underlying boto library
         get_logger('boto').setLevel(self._boto_log_level)
 
-# Still inherit from BaseBoto, otherwise super().__init__ doesn't work
-# BaseBoto.register(Boto)
+    def get_valid_regions(self):
+        """
+        Gets all AWS regions that Krux can access
 
+        :return: A list of :py:class:`RegionCode.Region` for the known regions. For any new regions
+                 for which the enum does not exist, just returns the name of the region as a string.
+        :rtype: list[RegionCode.Region]
+        """
+        conn = self._boto.ec2.connect_to_region(self.cli_region)
+
+        regions = []
+        for region in conn.get_all_regions():
+            if getattr(RegionCode.Region, region.name, None) is not None:
+                regions.append(RegionCode.Region[region.name])
+            else:
+                regions.append(region.name)
+
+        return regions
 
 class Boto3(BaseBoto):
 
@@ -337,5 +363,21 @@ class Boto3(BaseBoto):
         # called 'botocore'
         get_logger('botocore').setLevel(self._boto_log_level)
 
-# Still inherit from BaseBoto, otherwise super().__init__ doesn't work
-# BaseBoto.register(Boto3)
+    def get_valid_regions(self):
+        """
+        Gets all AWS regions that Krux can access
+
+        :return: A list of :py:class:`RegionCode.Region` for the known regions. For any new regions
+                 for which the enum does not exist, just returns the name of the region as a string.
+        :rtype: list[RegionCode.Region]
+        """
+        client = self._boto.client('ec2')
+
+        regions = []
+        for region in client.describe_regions().get('Regions', []):
+            if getattr(RegionCode.Region, region.get('RegionName'), None) is not None:
+                regions.append(RegionCode.Region[region.get('RegionName')])
+            else:
+                regions.append(region.get('RegionName'))
+
+        return regions

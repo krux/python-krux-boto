@@ -16,18 +16,17 @@ import sys
 # Third party libraries
 #
 
-import boto
-from argparse import ArgumentParser
-from mock import MagicMock, patch
+from mock import MagicMock, patch, call
 
 #
 # Internal libraries
 #
 
 from krux.stats import DummyStatsClient
-from krux_boto.boto import Boto, Boto3, add_boto_cli_arguments, NAME
+from krux_boto.boto import Boto, Boto3, NAME
 from krux_boto.cli import Application, main
 from krux.cli import get_group
+from krux_boto.util import RegionCode
 
 
 class CLItest(unittest.TestCase):
@@ -77,11 +76,16 @@ class CLItest(unittest.TestCase):
             main()
 
         # Verify the current region and all regions are logged as warning
-        mock_logger.warn.assert_any_call('Connected to region via boto2: %s', 'us-east-1')
-        mock_logger.warn.assert_any_call('Connected to region via boto3: %s', 'us-east-1')
+        warn_calls = []
+        warn_calls.append(call('Getting regions via boto2'))
 
-        for region in boto.connect_ec2().get_all_regions():
-            mock_logger.warn.assert_any_call('Region: %s', region.name)
+        for region in RegionCode.Region:
+            warn_calls.append(call('Region: %s - %s', RegionCode[region].name, str(region)))
+
+        warn_calls.append(call('Getting regions via boto3'))
+
+        for region in RegionCode.Region:
+            warn_calls.append(call('Region: %s - %s', RegionCode[region].name, str(region)))
 
         # Verify the mock sys.exit has been called
         mock_exit.assert_called_once_with(0)
