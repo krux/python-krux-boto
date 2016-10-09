@@ -9,7 +9,6 @@
 
 from __future__ import absolute_import
 import unittest
-import os
 from logging import Logger, INFO
 
 #
@@ -17,10 +16,9 @@ from logging import Logger, INFO
 #
 
 import boto
-import boto3
-
 from argparse import ArgumentParser
 from mock import MagicMock, patch
+from six import iteritems
 
 #
 # Internal libraries
@@ -72,7 +70,7 @@ class BotoTest(unittest.TestCase):
             self.assertEqual(credential_map[SECRET_KEY], krux_boto.boto.os.environ[SECRET_KEY])
 
         # Verify logging
-        for key, val in credential_map.iteritems():
+        for key, val in iteritems(credential_map):
             self.assertTrue(
                 ('Passed boto credentials is empty. Falling back to environment variable %s', key) not in mock_logger.debug.call_args_list
             )
@@ -107,7 +105,7 @@ class BotoTest(unittest.TestCase):
             self.assertNotIn(SECRET_KEY, krux_boto.boto.os.environ)
 
         # Verify the warning is logged
-        for key, val in credential_map.iteritems():
+        for key, val in iteritems(credential_map):
             mock_logger.debug.assert_any_call('Passed boto credentials is empty. Falling back to environment variable %s', key)
             self.assertTrue(('Setting boto credential %s to %s', key, '<empty>') not in mock_logger.debug.call_args_list)
             mock_logger.info.assert_any_call(
@@ -162,7 +160,7 @@ class BotoTest(unittest.TestCase):
                     logger=mock_logger
                 )
 
-        for key, value in credential_map.iteritems():
+        for key, value in iteritems(credential_map):
             msg = 'You set %s as {0} in CLI, but passed %s to the library. ' \
                 'To avoid this error, consider using get_boto() function. ' \
                 'For more information, please check README.' \
