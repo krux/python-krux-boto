@@ -31,6 +31,8 @@ import boto.utils
 # Version3
 import boto3
 
+from six import iteritems
+
 #
 # Internal libraries
 #
@@ -142,13 +144,13 @@ def add_boto_cli_arguments(parser):
     group.add_argument(
         '--boto-access-key',
         default=DEFAULT['access_key'](),
-        help='AWS Access Key to use. Defaults to ENV[%s]' % ACCESS_KEY,
+        help='AWS Access Key to use. Defaults to ENV[{0}]'.format(ACCESS_KEY)
     )
 
     group.add_argument(
         '--boto-secret-key',
         default=DEFAULT['secret_key'](),
-        help='AWS Secret Key to use. Defaults to ENV[%s]' % SECRET_KEY,
+        help='AWS Secret Key to use. Defaults to ENV[{0}]'.format(SECRET_KEY),
     )
 
     group.add_argument(
@@ -238,7 +240,7 @@ class BaseBoto(object):
             SECRET_KEY: secret_key,
         }
 
-        for env_var, val in credential_map.iteritems():
+        for env_var, val in iteritems(credential_map):
             if val is None or len(val) < 1:
                 self._logger.debug('Passed boto credentials is empty. Falling back to environment variable %s', env_var)
             else:
@@ -335,6 +337,7 @@ class Boto(BaseBoto):
                 regions.append(region.name)
 
         return regions
+
 
 class Boto3(BaseBoto):
 

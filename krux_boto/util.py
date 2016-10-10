@@ -17,6 +17,7 @@ from collections import Mapping
 
 import boto.utils
 from enum import Enum
+from six import iteritems
 
 #
 # Internal libraries
@@ -99,7 +100,7 @@ class __RegionCode(Mapping):
         #       Thus, we cannot handle the difference of underscore and dash gracefully.
         #       However, since __getitem__() is merely a lookup of _member_map_ dictionary, duplicate the elements
         #       in the private dictionary so that we can handle AWS region <-> RegionCode.Region conversion smoothly.
-        for name, region in self.Region._member_map_.iteritems():
+        for name, region in iteritems(self.Region._member_map_):
             self.Region._member_map_[name.lower().replace('_', '-')] = region
 
     def __iter__(self):

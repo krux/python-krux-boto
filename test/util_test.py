@@ -15,8 +15,8 @@ from logging import Logger
 # Third party libraries
 #
 
-import boto
 from mock import MagicMock, patch
+from six import iteritems
 
 #
 # Internal libraries
@@ -101,7 +101,7 @@ class RegionCodeTest(unittest.TestCase):
         """
         RegionCode.__iter__() is correctly set up and iterates through the dictionary.
         """
-        for key, value in RegionCode.iteritems():
+        for key, value in iteritems(RegionCode):
             self.assertEquals(self.REGIONS[key], value)
 
     def test_len(self):
