@@ -84,6 +84,7 @@ class RegionCodeTest(unittest.TestCase):
         RegionCode.Code.ICN: RegionCode.Region.ap_northeast_2,
         RegionCode.Code.GRU: RegionCode.Region.sa_east_1,
         RegionCode.Code.SJC: RegionCode.Region.us_west_1,
+        RegionCode.Code.CMH: RegionCode.Region.us_east_2,
         RegionCode.Region.us_east_1: RegionCode.Code.ASH,
         RegionCode.Region.us_west_2: RegionCode.Code.PDX,
         RegionCode.Region.eu_west_1: RegionCode.Code.DUB,
@@ -95,6 +96,7 @@ class RegionCodeTest(unittest.TestCase):
         RegionCode.Region.ap_northeast_2: RegionCode.Code.ICN,
         RegionCode.Region.sa_east_1: RegionCode.Code.GRU,
         RegionCode.Region.us_west_1: RegionCode.Code.SJC,
+        RegionCode.Region.us_east_2: RegionCode.Code.CMH,
     }
 
     def test_iter(self):
