@@ -61,7 +61,7 @@ class __RegionCode(Mapping):
         DUB = 3   # Dublin, Ireland
         SIN = 4   # Singapore
         BOM = 5   # Mumbai (Bombay), India
-        SYN = 6   # Sydney, Australia
+        SYD = 6   # Sydney, Australia
         FRA = 7   # Frankfurt, Germany
         NRT = 8   # Tokyo (Narita), Japan
         ICN = 9   # Seoul (Incheon), South Korea
