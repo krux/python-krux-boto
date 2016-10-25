@@ -61,12 +61,13 @@ class __RegionCode(Mapping):
         DUB = 3   # Dublin, Ireland
         SIN = 4   # Singapore
         BOM = 5   # Mumbai (Bombay), India
-        SYN = 6   # Sydney, Australia
+        SYD = 6   # Sydney, Australia
         FRA = 7   # Frankfurt, Germany
         NRT = 8   # Tokyo (Narita), Japan
         ICN = 9   # Seoul (Incheon), South Korea
         GRU = 10  # Sao Paulo (Guarulhos), Brazil
         SJC = 11  # San Jose, California
+        CMH = 12  # Columbus, Ohio
 
     class Region(Enum):
         """
@@ -83,6 +84,7 @@ class __RegionCode(Mapping):
         ap_northeast_2 = 9
         sa_east_1 = 10
         us_west_1 = 11
+        us_east_2 = 12
 
         def __str__(self):
             return self.name.lower().replace('_', '-')
