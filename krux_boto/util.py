@@ -102,8 +102,10 @@ class __RegionCode(Mapping):
         #       Thus, we cannot handle the difference of underscore and dash gracefully.
         #       However, since __getitem__() is merely a lookup of _member_map_ dictionary, duplicate the elements
         #       in the private dictionary so that we can handle AWS region <-> RegionCode.Region conversion smoothly.
+        dash_dict = {}
         for name, region in iteritems(self.Region._member_map_):
-            self.Region._member_map_[name.lower().replace('_', '-')] = region
+            dash_dict[name.lower().replace('_', '-')] = region
+        self.Region._member_map_.update(dash_dict)
 
     def __iter__(self):
         return iter(self._wrapped)

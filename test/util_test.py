@@ -147,7 +147,7 @@ class RegionCodeTest(unittest.TestCase):
         for reg in list(RegionCode.Region):
             self.assertEquals(self.REGIONS[reg], RegionCode[reg.name])
 
-    def test_get_by_region_str_uppder(self):
+    def test_get_by_region_str_upper(self):
         """
         Code can be correctly retrieved from Region string using RegionCode, regardless of the case
         """
