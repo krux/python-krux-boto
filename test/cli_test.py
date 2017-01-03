@@ -11,6 +11,7 @@ from __future__ import absolute_import
 import unittest
 from logging import Logger
 import sys
+import pkg_resources
 
 #
 # Third party libraries
@@ -27,10 +28,10 @@ from krux_boto.boto import Boto, Boto3, NAME
 from krux_boto.cli import Application, main
 from krux.cli import get_group
 from krux_boto.util import RegionCode
-from krux_boto import VERSION
 
 
 class CLItest(unittest.TestCase):
+    _VERSION = pkg_resources.require('krux-boto')[0].version
 
     def test_init(self):
         """
@@ -50,7 +51,7 @@ class CLItest(unittest.TestCase):
 
         # Verify the version info is specified
         self.assertIn(NAME, self.app._VERSIONS)
-        self.assertEqual(VERSION, self.app._VERSIONS[NAME])
+        self.assertEqual(self._VERSION, self.app._VERSIONS[NAME])
 
     def test_add_cli_arguments(self):
         """
