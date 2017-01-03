@@ -22,8 +22,7 @@ from six import iteritems
 # Internal libraries
 #
 
-from krux_boto import get_instance_region, Error
-from krux_boto.util import RegionCode
+from krux_boto.util import RegionCode, get_instance_region, Error
 
 
 class UtilTest(unittest.TestCase):

@@ -12,14 +12,14 @@ Package setup for krux-boto
 #
 from __future__ import absolute_import
 from setuptools import setup, find_packages
+from krux_boto import VERSION
 
-# We use the version to construct the DOWNLOAD_URL.
-VERSION = '1.2.1'
 
 # URL to the repository on Github.
 REPO_URL = 'https://github.com/krux/python-krux-boto'
 # Github will generate a tarball as long as you tag your releases, so don't
 # forget to tag!
+# We use the version to construct the DOWNLOAD_URL.
 DOWNLOAD_URL = ''.join((REPO_URL, '/tarball/release/', VERSION))
 
 
