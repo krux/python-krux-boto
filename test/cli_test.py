@@ -27,6 +27,7 @@ from krux_boto.boto import Boto, Boto3, NAME
 from krux_boto.cli import Application, main
 from krux.cli import get_group
 from krux_boto.util import RegionCode
+from krux_boto import VERSION
 
 
 class CLItest(unittest.TestCase):
@@ -46,6 +47,10 @@ class CLItest(unittest.TestCase):
 
         self.assertIsInstance(self.app.boto, Boto)
         self.assertIsInstance(self.app.boto3, Boto3)
+
+        # Verify the version info is specified
+        self.assertIn(NAME, self.app._VERSIONS)
+        self.assertEqual(VERSION, self.app._VERSIONS[NAME])
 
     def test_add_cli_arguments(self):
         """

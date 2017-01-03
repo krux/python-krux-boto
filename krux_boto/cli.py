@@ -8,26 +8,27 @@
 #
 
 from __future__ import absolute_import
-from pprint import pprint
 
 #
 # Third party libraries
 #
-
-import boto
 
 #
 # Internal libraries
 #
 
 import krux.cli
+from krux_boto import VERSION
 from krux_boto.boto import add_boto_cli_arguments, get_boto, get_boto3, NAME
 from krux_boto.util import RegionCode
 
 
 class Application(krux.cli.Application):
 
-    def __init__(self, name=NAME):
+    def __init__(self, name=NAME, *args, **kwargs):
+
+        self._VERSIONS[NAME] = VERSION
+
         # Call to the superclass to bootstrap.
         super(Application, self).__init__(name=name)
 
