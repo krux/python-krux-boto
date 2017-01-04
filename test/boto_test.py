@@ -175,12 +175,14 @@ class BotoTest(unittest.TestCase):
         # Verify logging
         for key, val in iteritems(credential_map):
             self.assertTrue(
-                ('Passed boto credentials is empty. Falling back to environment variable %s', key) not in mock_logger.debug.call_args_list
+                ('Passed boto credentials is empty. Falling back to environment variable %s', key)
+                not in mock_logger.debug.call_args_list
             )
             obsc = val[0:3] + '[...]' + val[-3:]
             mock_logger.debug.assert_any_call('Setting boto credential %s to %s', key, obsc)
             self.assertTrue(
-                ('Boto environment credential %s NOT explicitly set -- boto will look for a .boto file somewhere', key) not in mock_logger.info.call_args_list
+                ('Boto environment credential %s NOT explicitly set -- boto will look for a .boto file somewhere', key)
+                not in mock_logger.info.call_args_list
             )
 
     def test_credential_logging_empty(self):
