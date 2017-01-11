@@ -8,13 +8,11 @@
 #
 
 from __future__ import absolute_import
-from pprint import pprint
+import pkg_resources
 
 #
 # Third party libraries
 #
-
-import boto
 
 #
 # Internal libraries
@@ -26,8 +24,15 @@ from krux_boto.util import RegionCode
 
 
 class Application(krux.cli.Application):
+    # XXX: Usually, a VERSION constant should be set in __init__.py and be imported.
+    #      However, krux-boto adds some basic classes to __init__.py and importing VERSION constant here
+    #      causes a dependency circle. Thus, set VERSION constant in setup.py as usual and import it
+    #      here using pkg_resources
+    _VERSION = pkg_resources.require('krux-boto')[0].version
 
-    def __init__(self, name=NAME):
+    def __init__(self, name=NAME, *args, **kwargs):
+        self._VERSIONS[NAME] = self._VERSION
+
         # Call to the superclass to bootstrap.
         super(Application, self).__init__(name=name)
 
