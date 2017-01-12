@@ -27,7 +27,110 @@ from six import iteritems
 import krux_boto.boto
 import krux.cli
 import krux.logging
-from krux_boto.boto import Boto, Boto3, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY
+from krux_boto.boto import Boto, Boto3, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY, get_boto, get_boto3
+
+
+class GetBotoTest(unittest.TestCase):
+    FAKE_LOG_LEVEL = 'critical'
+    FAKE_ACCESS_KEY = 'FAKE_ACCESS_KEY'
+    FAKE_SECRET_KEY = 'FAKE_SECRET_KEY'
+    FAKE_REGION = 'us-gov-west-1'  # This is a region that Krux will never use.
+
+    _FAKE_COMMAND = [
+        'krux-boto',
+        '--boto-log-level', FAKE_LOG_LEVEL,
+        '--boto-access-key', FAKE_ACCESS_KEY,
+        '--boto-secret-key', FAKE_SECRET_KEY,
+        '--boto-region', FAKE_REGION,
+        '--foo',  # Adding an extra CLI argument to make sure this gets ignored without an error
+    ]
+
+    def setUp(self):
+        self.args = MagicMock(
+            boto_log_level=self.FAKE_LOG_LEVEL,
+            boto_access_key=self.FAKE_ACCESS_KEY,
+            boto_secret_key=self.FAKE_SECRET_KEY,
+            boto_region=self.FAKE_REGION
+        )
+
+        self.logger = MagicMock()
+        self.stats = MagicMock()
+
+    @patch('krux_boto.boto.Boto')
+    def test_get_boto_with_args(self, mock_boto):
+        """
+        get_boto correctly passes the arguments to Boto contructor
+        """
+        get_boto(self.args, self.logger, self.stats)
+
+        mock_boto.assert_called_once_with(
+            log_level=self.args.boto_log_level,
+            access_key=self.args.boto_access_key,
+            secret_key=self.args.boto_secret_key,
+            region=self.args.boto_region,
+            logger=self.logger,
+            stats=self.stats,
+        )
+
+    @patch('sys.argv', _FAKE_COMMAND)
+    @patch('krux_boto.boto.Boto')
+    @patch('krux_boto.boto.get_logger')
+    @patch('krux_boto.boto.get_stats')
+    def test_get_boto_without_args(self, mock_get_stats, mock_get_logger, mock_boto):
+        """
+        get_boto correctly parses the CLI arguments and pass them to Boto contructor
+        """
+        mock_get_stats.return_value = self.stats
+        mock_get_logger.return_value = self.logger
+
+        get_boto()
+
+        mock_boto.assert_called_once_with(
+            log_level=self.args.boto_log_level,
+            access_key=self.args.boto_access_key,
+            secret_key=self.args.boto_secret_key,
+            region=self.args.boto_region,
+            logger=self.logger,
+            stats=self.stats,
+        )
+
+    @patch('krux_boto.boto.Boto3')
+    def test_get_boto3_with_args(self, mock_boto3):
+        """
+        get_boto3 correctly passes the arguments to Boto3 contructor
+        """
+        get_boto3(self.args, self.logger, self.stats)
+
+        mock_boto3.assert_called_once_with(
+            log_level=self.args.boto_log_level,
+            access_key=self.args.boto_access_key,
+            secret_key=self.args.boto_secret_key,
+            region=self.args.boto_region,
+            logger=self.logger,
+            stats=self.stats,
+        )
+
+    @patch('sys.argv', _FAKE_COMMAND)
+    @patch('krux_boto.boto.Boto3')
+    @patch('krux_boto.boto.get_logger')
+    @patch('krux_boto.boto.get_stats')
+    def test_get_boto3_without_args(self, mock_get_stats, mock_get_logger, mock_boto3):
+        """
+        get_boto3 correctly parses the CLI arguments and pass them to Boto3 contructor
+        """
+        mock_get_stats.return_value = self.stats
+        mock_get_logger.return_value = self.logger
+
+        get_boto3()
+
+        mock_boto3.assert_called_once_with(
+            log_level=self.args.boto_log_level,
+            access_key=self.args.boto_access_key,
+            secret_key=self.args.boto_secret_key,
+            region=self.args.boto_region,
+            logger=self.logger,
+            stats=self.stats,
+        )
 
 
 class BotoTest(unittest.TestCase):
@@ -72,12 +175,14 @@ class BotoTest(unittest.TestCase):
         # Verify logging
         for key, val in iteritems(credential_map):
             self.assertTrue(
-                ('Passed boto credentials is empty. Falling back to environment variable %s', key) not in mock_logger.debug.call_args_list
+                ('Passed boto credentials is empty. Falling back to environment variable %s', key)
+                not in mock_logger.debug.call_args_list
             )
             obsc = val[0:3] + '[...]' + val[-3:]
             mock_logger.debug.assert_any_call('Setting boto credential %s to %s', key, obsc)
             self.assertTrue(
-                ('Boto environment credential %s NOT explicitly set -- boto will look for a .boto file somewhere', key) not in mock_logger.info.call_args_list
+                ('Boto environment credential %s NOT explicitly set -- boto will look for a .boto file somewhere', key)
+                not in mock_logger.info.call_args_list
             )
 
     def test_credential_logging_empty(self):

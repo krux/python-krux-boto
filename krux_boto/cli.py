@@ -47,6 +47,8 @@ class Application(krux.cli.Application):
         add_boto_cli_arguments(parser)
 
     def run(self):
+        self.logger.debug('Parsed arguments: %s', self.args)
+
         self._sample_boto2()
         self._sample_boto3()
 

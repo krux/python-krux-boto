@@ -77,7 +77,11 @@ def get_boto(args=None, logger=None, stats=None):
     if not args:
         parser = get_parser()
         add_boto_cli_arguments(parser)
-        args = parser.parse_args()
+        # Parse only the known arguments added by add_boto_cli_arguments().
+        # We only need those arguments to create Boto object, nothing else.
+        # parse_known_args() return (Namespace, list of unknown arguments),
+        # we only care about the Namespace object here.
+        args = parser.parse_known_args()[0]
 
     if not logger:
         logger = get_logger(name=NAME)
@@ -111,7 +115,11 @@ def get_boto3(args=None, logger=None, stats=None):
     if not args:
         parser = get_parser()
         add_boto_cli_arguments(parser)
-        args = parser.parse_args()
+        # Parse only the known arguments added by add_boto_cli_arguments().
+        # We only need those arguments to create Boto object, nothing else.
+        # parse_known_args() return (Namespace, list of unknown arguments),
+        # we only care about the Namespace object here.
+        args = parser.parse_known_args()[0]
 
     if not logger:
         logger = get_logger(name=NAME)
