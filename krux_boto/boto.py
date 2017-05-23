@@ -46,6 +46,7 @@ from krux_boto.util import RegionCode
 # Constants
 ACCESS_KEY = 'AWS_ACCESS_KEY_ID'
 SECRET_KEY = 'AWS_SECRET_ACCESS_KEY'
+REGION = 'AWS_REGION'
 NAME = 'krux-boto'
 
 # Defaults
@@ -57,7 +58,7 @@ DEFAULT = {
     'log_level': lambda: DEFAULT_LOG_LEVEL,
     'access_key': lambda: os.environ.get(ACCESS_KEY),
     'secret_key': lambda: os.environ.get(SECRET_KEY),
-    'region': lambda: 'us-east-1'
+    'region': lambda: os.environ.get(REGION)
 }
 
 
@@ -198,7 +199,11 @@ class BaseBoto(object):
             secret_key = DEFAULT['secret_key']()
 
         if region is None:
-            region = DEFAULT['region']()
+            if DEFAULT['region']() is None:
+                self._logger.warn('There is not a default region set in your environment variables. Defaulted to \'us-east-1\'')
+                region = 'us-east-1'
+            else:
+                region = DEFAULT['region']()
 
         # GOTCHA: Due to backward incompatible version change in v1.0.0, the users of krux_boto may pass wrong credential
         # Make sure the passed credential via CLI is the same as one passed into this instance
@@ -239,7 +244,6 @@ class BaseBoto(object):
         # So for now, we just store the region that was asked for, and let the
         # caller use it. See the sample app for a howto.
         self.cli_region = region
-
         # if these are set, make sure we set the environment again
         # as well; that way the underlying boto calls will just DTRT
         # without the need to wrap all the functions.
@@ -247,7 +251,6 @@ class BaseBoto(object):
             ACCESS_KEY: access_key,
             SECRET_KEY: secret_key,
         }
-
         for env_var, val in iteritems(credential_map):
             if val is None or len(val) < 1:
                 self._logger.debug('Passed boto credentials is empty. Falling back to environment variable %s', env_var)

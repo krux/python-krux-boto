@@ -27,7 +27,7 @@ from six import iteritems
 import krux_boto.boto
 import krux.cli
 import krux.logging
-from krux_boto.boto import Boto, Boto3, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY, get_boto, get_boto3
+from krux_boto.boto import Boto, Boto3, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY, REGION, get_boto, get_boto3
 
 
 class GetBotoTest(unittest.TestCase):
@@ -135,16 +135,49 @@ class GetBotoTest(unittest.TestCase):
 
 class BotoTest(unittest.TestCase):
 
-    def test_cli_region(self):
+    def test_cli_empty_region(self):
         """
-        --boto-region arguments sets boto.cli_region variable correctly
+        check region if environment not set
         """
-        region = 'us-west-2'
-        self.boto = Boto(
-            region=region,
-        )
+        region = 'us-west-1'
+        with patch.dict('krux_boto.boto.os.environ', clear=True):
+            self.boto = Boto()
+            # Check the region is correctly default set in the mocked os.environ dictionary
+            self.assertEqual(self.boto.cli_region, 'us-east-1')
 
-        self.assertEqual(region, self.boto.cli_region)
+            self.boto = Boto(
+                region=region
+            )
+            #Check region can be set with command line argument with no environment variables
+            self.assertEqual(self.boto.cli_region, region)
+            
+    def test_region_default(self):
+        """
+        --boto-region sets default region correctly
+        """
+        # Mocking the os.environ dictionary as an empty dictionary
+        with patch.dict('krux_boto.boto.os.environ', clear=True):
+            krux_boto.boto.os.environ[REGION] = 'us-west-2'
+            self.boto = Boto()
+            # Check the region is correctly set in the mocked os.environ dictionary
+            self.assertIn(REGION, krux_boto.boto.os.environ)
+            self.assertEqual(self.boto.cli_region, krux_boto.boto.os.environ[REGION])
+
+    def test_region_cli_input(self):
+        """
+        --boto-region set correctly with command line input
+        """
+        region = 'us-east-1'
+        # Mocking the os.environ dictionary as an empty dictionary
+        with patch.dict('krux_boto.boto.os.environ', clear=True):
+            krux_boto.boto.os.environ[REGION] = 'us-west-2'
+            self.boto = Boto(
+                region=region,
+            )
+            # Check the region is correctly set in the mocked os.environ dictionary
+            self.assertIn(REGION, krux_boto.boto.os.environ)
+            self.assertNotEqual(self.boto.cli_region, krux_boto.boto.os.environ[REGION])
+            self.assertEqual(self.boto.cli_region, region)
 
     def test_credential_logging_success(self):
         """
@@ -165,7 +198,6 @@ class BotoTest(unittest.TestCase):
                 secret_key=credential_map[SECRET_KEY],
                 logger=mock_logger,
             )
-
             # Check the passed boto credentials are correctly set in the mocked os.environ dictionary
             self.assertIn(ACCESS_KEY, krux_boto.boto.os.environ)
             self.assertEqual(credential_map[ACCESS_KEY], krux_boto.boto.os.environ[ACCESS_KEY])
@@ -234,7 +266,6 @@ class BotoTest(unittest.TestCase):
                 'msg': 'boto-secret-key',
             },
         }
-
         # Mocking the parser to trigger the warning
         parser = krux.cli.get_parser()
         add_boto_cli_arguments(parser)
