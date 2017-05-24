@@ -135,29 +135,34 @@ class GetBotoTest(unittest.TestCase):
 
 class BotoTest(unittest.TestCase):
 
-    def test_cli_empty_region(self):
+    def test_region_no_env(self):
         """
-        check region if environment not set
+        Region default correct if environment not set
         """
         region = 'us-west-1'
-        with patch.dict('krux_boto.boto.os.environ', clear=True):
+        with patch.dict('krux_boto.boto.os.environ', {}):
             self.boto = Boto()
-            # Check the region is correctly default set in the mocked os.environ dictionary
+            # Check that the region has correct default
             self.assertEqual(self.boto.cli_region, 'us-east-1')
 
+    def test_region_no_env_cli(self):
+        """
+        Region CLI input works fine with no environment variable set
+        """
+        region = 'us-west-1'
+        with patch.dict('krux_boto.boto.os.environ', {}):
             self.boto = Boto(
                 region=region
             )
             #Check region can be set with command line argument with no environment variables
             self.assertEqual(self.boto.cli_region, region)
-            
+
     def test_region_default(self):
         """
         --boto-region sets default region correctly
         """
         # Mocking the os.environ dictionary as an empty dictionary
-        with patch.dict('krux_boto.boto.os.environ', clear=True):
-            krux_boto.boto.os.environ[REGION] = 'us-west-2'
+        with patch.dict('krux_boto.boto.os.environ', {REGION: 'us-west-2'}):
             self.boto = Boto()
             # Check the region is correctly set in the mocked os.environ dictionary
             self.assertIn(REGION, krux_boto.boto.os.environ)
@@ -169,8 +174,7 @@ class BotoTest(unittest.TestCase):
         """
         region = 'us-east-1'
         # Mocking the os.environ dictionary as an empty dictionary
-        with patch.dict('krux_boto.boto.os.environ', clear=True):
-            krux_boto.boto.os.environ[REGION] = 'us-west-2'
+        with patch.dict('krux_boto.boto.os.environ', {REGION: 'us-west-2'}):
             self.boto = Boto(
                 region=region,
             )

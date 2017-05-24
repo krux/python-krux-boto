@@ -58,7 +58,7 @@ DEFAULT = {
     'log_level': lambda: DEFAULT_LOG_LEVEL,
     'access_key': lambda: os.environ.get(ACCESS_KEY),
     'secret_key': lambda: os.environ.get(SECRET_KEY),
-    'region': lambda: os.environ.get(REGION)
+    'region': lambda: os.environ.get(REGION),
 }
 
 
@@ -199,11 +199,10 @@ class BaseBoto(object):
             secret_key = DEFAULT['secret_key']()
 
         if region is None:
-            if DEFAULT['region']() is None:
+            region = DEFAULT['region']()
+            if region is None:
                 self._logger.warn('There is not a default region set in your environment variables. Defaulted to \'us-east-1\'')
                 region = 'us-east-1'
-            else:
-                region = DEFAULT['region']()
 
         # GOTCHA: Due to backward incompatible version change in v1.0.0, the users of krux_boto may pass wrong credential
         # Make sure the passed credential via CLI is the same as one passed into this instance
