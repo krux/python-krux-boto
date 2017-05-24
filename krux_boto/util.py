@@ -43,6 +43,14 @@ def get_instance_region():
         raise Error('get_instance_region failed to get the local instance region')
     return zone.rstrip(string.lowercase)
 
+def setup_hosts(hosts, accepted_domains=['krxd.net'], default='krxd.net'):
+    """
+    Loop through hosts to check if krxd.net domain is present
+    """
+    for i in range(len(hosts)):
+        if hosts[i][-8:len(hosts[i])] not in accepted_domains:
+            hosts[i] += '.' + default
+    return hosts
 
 # Region codes
 class __RegionCode(Mapping):
