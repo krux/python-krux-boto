@@ -166,7 +166,7 @@ def add_boto_cli_arguments(parser):
         '--boto-region',
         default=DEFAULT['region'](),
         choices=[r.name for r in boto.ec2.regions()],
-        help='EC2 Region to connect to. (default: %(default)s)',
+        help='EC2 Region to connect to. Defaults to ENV[{0}]. If not ENV set, defaults to us-east-1.'.format(REGION),
     )
 
 
@@ -201,7 +201,7 @@ class BaseBoto(object):
         if region is None:
             region = DEFAULT['region']()
             if region is None:
-                self._logger.warn('There is not a default region set in your environment variables. Defaulted to \'us-east-1\'')
+                self._logger.warn("There is not a default region set in your environment variables. Defaulted to 'us-east-1'")
                 region = 'us-east-1'
 
         # GOTCHA: Due to backward incompatible version change in v1.0.0, the users of krux_boto may pass wrong credential
