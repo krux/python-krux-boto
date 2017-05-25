@@ -50,7 +50,7 @@ def setup_hosts(hosts, accepted_domains=['krxd.net'], default='krxd.net'):
     for i in range(len(hosts)):
         if hosts[i][-8:len(hosts[i])] not in accepted_domains:
             hosts[i] += '.' + default
-    return hosts
+    return list(hosts)
 
 # Region codes
 class __RegionCode(Mapping):
