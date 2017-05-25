@@ -45,12 +45,23 @@ def get_instance_region():
 
 def setup_hosts(hosts, accepted_domains=['krxd.net'], default='krxd.net'):
     """
-    Loop through hosts to check if krxd.net domain is present
+    Loop through hosts to check if the domain matches any in accepted_domains. If not, append default.
+    This function will return a new list.
+
+    :param hosts: A list of hostname strings
+    :param accepted_domains: A list of accepted domain strings
+    :param default: A default domain name string to be appended to the hostnames
+
+    :return: A list of modified host name strings
     """
+    new_hostnames = []
     for i in range(len(hosts)):
-        if hosts[i][-8:] not in accepted_domains:
-            hosts[i] += '.' + default
-    return list(hosts)
+        # Python 2.6 support
+        if hosts[i][-8:len(hosts[i])] not in accepted_domains:
+            new_hostnames.append(hosts[i] + '.' + default)
+        else:
+            new_hostnames.append(hosts[i])
+    return new_hostnames
 
 # Region codes
 class __RegionCode(Mapping):

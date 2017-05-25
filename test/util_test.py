@@ -75,7 +75,7 @@ class UtilTest(unittest.TestCase):
         """
         mock_host_list = ['ops-dev004', 'ops-dev003', 'ops-dev005']
         appended_hosts = setup_hosts(mock_host_list)
-        self.assertEquals(['ops-dev004.krxd.net', 'ops-dev003.krxd.net', 'ops-dev005.krxd.net'], appended_hosts)
+        self.assertEquals([s + '.krxd.net' for s in mock_host_list], appended_hosts)
 
     def test_setup_host_with_domain(self):
         """
@@ -89,9 +89,11 @@ class UtilTest(unittest.TestCase):
         """
         setup_hosts works correctly with hosts with and without domains
         """
-        mock_host_list = ['ops-dev004', 'ops-dev003.krxd.net']
-        appended_hosts = setup_hosts(mock_host_list)
-        self.assertEquals(['ops-dev004.krxd.net', 'ops-dev003.krxd.net'], appended_hosts)
+        mock_host_list_with = ['ops-dev003.krxd.net']
+        mock_host_list_without = ['ops-dev004']
+        appended_hosts = setup_hosts(mock_host_list_without + mock_host_list_with)
+        mock_appended_hosts = [s + '.krxd.net' for s in mock_host_list_without] + mock_host_list_with
+        self.assertEquals(mock_appended_hosts, appended_hosts)
 
 class RegionCodeTest(unittest.TestCase):
     REGIONS = {
