@@ -74,7 +74,8 @@ class UtilTest(unittest.TestCase):
         setup_hosts correctly adds default domain to hosts with no domain
         """
         mock_host_list = ['ops-dev004', 'ops-dev003', 'ops-dev005']
-        self.assertEquals(map(lambda x: x + '.krxd.net', mock_host_list), setup_hosts(mock_host_list))
+        appended_hosts = setup_hosts(mock_host_list)
+        self.assertEquals(map(lambda x: x + '.krxd.net', mock_host_list), appended_hosts)
 
     def test_setup_host_with_domain(self):
         """
