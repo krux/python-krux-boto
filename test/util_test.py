@@ -69,6 +69,28 @@ class UtilTest(unittest.TestCase):
         # Verify a warning is thrown
         mock_logger.warn.assert_called_once_with('get_instance_region failed to get the local instance region')
 
+    def test_setup_host_with_no_domain(self):
+        """
+        setup_hosts correctly adds default domain to hosts with no domain
+        """
+        mock_host_list = ['ops-dev004', 'ops-dev003', 'ops-dev005']
+        self.assertEquals(map(lambda x: x + '.krxd.net', mock_host_list), setup_hosts(mock_host_list))
+
+    def test_setup_host_with_domain(self):
+        """
+        setup_hosts correctly skips hosts with domain already added
+        """
+        mock_host_list = ['ops-dev004.krxd.net', 'ops-dev003.krxd.net', 'ops-dev005.krxd.net']
+        appended_hosts = setup_hosts(mock_host_list)
+        self.assertEquals(mock_host_list, appended_hosts)
+
+    def test_setup_host_mixed_domains(self):
+        """
+        setup_hosts works correctly with hosts with and without domains
+        """
+        mock_host_list = ['ops-dev004', 'ops-dev003.krxd.net']
+        appended_hosts = setup_hosts(mock_host_list)
+        self.assertEquals(['ops-dev004.krxd.net', 'ops-dev003.krxd.net'], appended_hosts)
 
 class RegionCodeTest(unittest.TestCase):
     REGIONS = {
