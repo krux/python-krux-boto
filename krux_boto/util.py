@@ -48,7 +48,7 @@ def setup_hosts(hosts, accepted_domains=['krxd.net'], default='krxd.net'):
     Loop through hosts to check if krxd.net domain is present
     """
     for i in range(len(hosts)):
-        if hosts[i][-8:len(hosts[i])] not in accepted_domains:
+        if hosts[i][-8:] not in accepted_domains:
             hosts[i] += '.' + default
     return list(hosts)
 
