@@ -75,7 +75,7 @@ class UtilTest(unittest.TestCase):
         """
         mock_host_list = ['ops-dev004', 'ops-dev003', 'ops-dev005']
         appended_hosts = setup_hosts(mock_host_list)
-        self.assertEquals(map(lambda x: x + '.krxd.net', mock_host_list), appended_hosts)
+        self.assertEquals(['ops-dev004.krxd.net', 'ops-dev003.krxd.net', 'ops-dev005.krxd.net'], appended_hosts)
 
     def test_setup_host_with_domain(self):
         """
