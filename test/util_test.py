@@ -73,37 +73,43 @@ class UtilTest(unittest.TestCase):
         """
         setup_hosts correctly adds default domain to hosts with no domain
         """
+        accepted_hosts = ['krux.com']
+        default_domain = 'krux.com'
         mock_host_list = ['ops-dev004', 'ops-dev003', 'ops-dev005']
-        appended_hosts = setup_hosts(mock_host_list)
-        self.assertEquals([s + '.krxd.net' for s in mock_host_list], appended_hosts)
+        appended_hosts = setup_hosts(mock_host_list, accepted_hosts, default_domain)
+        self.assertEquals([s + '.' + default_domain for s in mock_host_list], appended_hosts)
 
     def test_setup_host_with_domain(self):
         """
         setup_hosts correctly skips hosts with domain already added
         """
-        mock_host_list = ['ops-dev004.krxd.net', 'ops-dev003.krxd.net', 'ops-dev005.krxd.net']
-        appended_hosts = setup_hosts(mock_host_list)
+        accepted_hosts = ['krux.com']
+        default_domain = 'krux.com'
+        mock_host_list = ['ops-dev004.krux.com', 'ops-dev003.krux.com', 'ops-dev005.krux.com']
+        appended_hosts = setup_hosts(mock_host_list, accepted_hosts, default_domain)
         self.assertEquals(mock_host_list, appended_hosts)
 
     def test_setup_host_mixed_domains(self):
         """
         setup_hosts works correctly with hosts with and without domains
         """
-        mock_host_list_with = ['ops-dev003.krxd.net']
+        accepted_hosts = ['krux.com']
+        default_domain = 'krux.com'
+        mock_host_list_with = ['ops-dev003.krux.com']
         mock_host_list_without = ['ops-dev004']
-        appended_hosts = setup_hosts(mock_host_list_without + mock_host_list_with)
-        mock_appended_hosts = [s + '.krxd.net' for s in mock_host_list_without] + mock_host_list_with
+        appended_hosts = setup_hosts(mock_host_list_without + mock_host_list_with, accepted_hosts, default_domain)
+        mock_appended_hosts = [s + '.' + default_domain for s in mock_host_list_without] + mock_host_list_with
         self.assertEquals(mock_appended_hosts, appended_hosts)
 
     def test_setup_host_with_accepted_hosts(self):
         """
         setup_hosts works correctly with multiple accepted domains with varying length
         """
-        accepted_hosts = ['krxd.net', 'krxd.io']
-        default_domain = 'krxd.net'
-        mock_host_list_with = ['ops-dev003.krxd.net', 'ops-dev004.krxd.io']
+        accepted_hosts = ['krux.com', 'krux.io']
+        default_domain = 'krux.com'
+        mock_host_list_with = ['ops-dev003.krux.com', 'ops-dev004.krux.io']
         mock_host_list_without = ['ops-dev001', 'ops-dev002']
-        mock_appended_hosts = [s + '.krxd.net' for s in mock_host_list_without] + mock_host_list_with
+        mock_appended_hosts = [s + '.' + default_domain for s in mock_host_list_without] + mock_host_list_with
         appended_hosts = setup_hosts(mock_host_list_without + mock_host_list_with, accepted_hosts, default_domain)
         self.assertEquals(mock_appended_hosts, appended_hosts)
 
