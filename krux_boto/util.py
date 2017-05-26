@@ -25,7 +25,6 @@ from six import iteritems
 
 from krux.logging import get_logger
 
-
 class Error(Exception):
     pass
 
@@ -43,6 +42,25 @@ def get_instance_region():
         raise Error('get_instance_region failed to get the local instance region')
     return zone.rstrip(string.lowercase)
 
+def setup_hosts(hosts, accepted_domains, default):
+    """
+    Loop through hosts to check if the domain matches any in accepted_domains. If not, append default.
+    This function will return a new list.
+
+    :param hosts: A list of hostname strings
+    :param accepted_domains: A list of accepted domain strings
+    :param default: A default domain name string to be appended to the hostnames
+
+    :return: A list of modified host name strings
+    """
+    new_hostnames = []
+    for i in range(len(hosts)):
+        # len(hosts[i]) is there for Python 2.6 string slice support
+        if any([hosts[i][-len(domain):len(hosts[i])] == domain for domain in accepted_domains]):
+            new_hostnames.append(hosts[i])
+        else:
+            new_hostnames.append(hosts[i] + '.' + default)
+    return new_hostnames
 
 # Region codes
 class __RegionCode(Mapping):
