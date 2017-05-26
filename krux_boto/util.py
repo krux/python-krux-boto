@@ -55,7 +55,7 @@ def setup_hosts(hosts, accepted_domains, default):
     """
     new_hostnames = []
     for i in range(len(hosts)):
-        # Python 2.6 support
+        # len(hosts[i]) is there for Python 2.6 string slice support
         if any([hosts[i][-len(domain):len(hosts[i])] == domain for domain in accepted_domains]):
             new_hostnames.append(hosts[i])
         else:
