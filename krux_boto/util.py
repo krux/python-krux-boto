@@ -25,6 +25,7 @@ from six import iteritems
 
 from krux.logging import get_logger
 
+DOMAIN = 'krxd.net'
 
 class Error(Exception):
     pass
@@ -43,7 +44,7 @@ def get_instance_region():
         raise Error('get_instance_region failed to get the local instance region')
     return zone.rstrip(string.lowercase)
 
-def setup_hosts(hosts, accepted_domains=['krxd.net'], default='krxd.net'):
+def setup_hosts(hosts, accepted_domains=[DOMAIN], default=DOMAIN):
     """
     Loop through hosts to check if the domain matches any in accepted_domains. If not, append default.
     This function will return a new list.
@@ -56,11 +57,10 @@ def setup_hosts(hosts, accepted_domains=['krxd.net'], default='krxd.net'):
     """
     new_hostnames = []
     for i in range(len(hosts)):
-        # Python 2.6 support
-        if hosts[i][-8:len(hosts[i])] not in accepted_domains:
-            new_hostnames.append(hosts[i] + '.' + default)
-        else:
+        if any([hosts[i][-len(domain):len(hosts[i])] == domain for domain in accepted_domains]):
             new_hostnames.append(hosts[i])
+        else:
+            new_hostnames.append(hosts[i] + '.' + default)
     return new_hostnames
 
 # Region codes

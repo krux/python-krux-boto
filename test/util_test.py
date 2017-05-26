@@ -95,6 +95,18 @@ class UtilTest(unittest.TestCase):
         mock_appended_hosts = [s + '.krxd.net' for s in mock_host_list_without] + mock_host_list_with
         self.assertEquals(mock_appended_hosts, appended_hosts)
 
+    def test_setup_host_with_accepted_hosts(self):
+        """
+        setup_hosts works correctly with multiple accepted domains with varying length
+        """
+        accepted_hosts = ['krxd.net', 'krxd.io']
+        default_domain = 'krxd.net'
+        mock_host_list_with = ['ops-dev003.krxd.net', 'ops-dev004.krxd.io']
+        mock_host_list_without = ['ops-dev001', 'ops-dev002']
+        mock_appended_hosts = [s + '.krxd.net' for s in mock_host_list_without] + mock_host_list_with
+        appended_hosts = setup_hosts(mock_host_list_without + mock_host_list_with, accepted_hosts, default_domain)
+        self.assertEquals(mock_appended_hosts, appended_hosts)
+
 class RegionCodeTest(unittest.TestCase):
     REGIONS = {
         RegionCode.Code.ASH: RegionCode.Region.us_east_1,
