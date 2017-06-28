@@ -140,12 +140,12 @@ class BotoTest(unittest.TestCase):
         Region default correct if environment not set
         """
         mock_logger = MagicMock(spec=Logger, autospec=True)
-        with patch.dict('krux_boto.boto.os.environ', {}):
+        with patch.dict('krux_boto.boto.os.environ', clear=True):
             self.boto = Boto(
                 logger=mock_logger,
             )
             # Check that the region has correct default
-            mock_logger.warn.assert_any_call("There is not a default region set in your environment variables. Defaulted to 'us-east-1'")
+            mock_logger.warn.assert_called_once_with("There is not a default region set in your environment variables. Defaulted to 'us-east-1'")
             self.assertEqual(self.boto.cli_region, 'us-east-1')
 
     def test_region_no_env_cli(self):
@@ -153,7 +153,7 @@ class BotoTest(unittest.TestCase):
         Region CLI input works fine with no environment variable set
         """
         region = 'us-west-1'
-        with patch.dict('krux_boto.boto.os.environ', {}):
+        with patch.dict('krux_boto.boto.os.environ', clear=True):
             self.boto = Boto(
                 region=region
             )

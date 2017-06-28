@@ -8,7 +8,6 @@
 #
 
 from __future__ import absolute_import
-import pkg_resources
 
 #
 # Third party libraries
@@ -22,13 +21,14 @@ import krux.cli
 from krux_boto.boto import add_boto_cli_arguments, get_boto, get_boto3, NAME
 from krux_boto.util import RegionCode
 
+from krux_boto.version import VERSION
+
 
 class Application(krux.cli.Application):
     # XXX: Usually, a VERSION constant should be set in __init__.py and be imported.
     #      However, krux-boto adds some basic classes to __init__.py and importing VERSION constant here
-    #      causes a dependency circle. Thus, set VERSION constant in setup.py as usual and import it
-    #      here using pkg_resources
-    _VERSION = pkg_resources.require('krux-boto')[0].version
+    #      causes a dependency circle. Thus, set VERSION constant in version.py and import it
+    _VERSION = VERSION
 
     def __init__(self, name=NAME, *args, **kwargs):
         self._VERSIONS[NAME] = self._VERSION
