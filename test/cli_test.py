@@ -34,6 +34,8 @@ from krux_boto.util import RegionCode
 
 class CLItest(unittest.TestCase):
     def setUp(self):
+        # path.dirname() gives current file's parent dir, calling twice would give us the correct path to version.json
+        # under the root folder.
         _VERSION_PATH = path.join(path.dirname(path.dirname(__file__)), 'version.json')
         with open(_VERSION_PATH, 'r') as f:
             self._VERSION = json.load(f).get('VERSION')

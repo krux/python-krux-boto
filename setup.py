@@ -15,6 +15,7 @@ from setuptools import setup, find_packages
 from os import path
 import json
 
+# To avoid the dependency cycle, read version from a non-py file version.json.
 _VERSION_PATH = path.join(path.dirname(__file__), 'version.json')
 with open(_VERSION_PATH, 'r') as f:
     VERSION = json.load(f).get('VERSION')
