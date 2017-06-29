@@ -10,8 +10,10 @@
 from __future__ import absolute_import
 import unittest
 from logging import Logger
+from os import path
 import sys
-import pkg_resources
+import json
+
 
 #
 # Third party libraries
@@ -31,7 +33,10 @@ from krux_boto.util import RegionCode
 
 
 class CLItest(unittest.TestCase):
-    _VERSION = pkg_resources.require('krux-boto')[0].version
+    def setUp(self):
+        _VERSION_PATH = path.join(path.dirname(path.dirname(__file__)), 'version.json')
+        with open(_VERSION_PATH, 'r') as f:
+            self._VERSION = json.load(f).get('VERSION')
 
     def test_init(self):
         """

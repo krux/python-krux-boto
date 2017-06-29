@@ -30,7 +30,7 @@ class Application(krux.cli.Application):
     #      causes a dependency circle. Thus, set VERSION constant in version.json and import it
 
     def __init__(self, name=NAME, *args, **kwargs):
-        _VERSION_PATH = path.join(path.dirname(__file__), 'version.json')
+        _VERSION_PATH = path.join(path.dirname(path.dirname(__file__)), 'version.json')
         with open(_VERSION_PATH, 'r') as f:
             self._VERSION = json.load(f).get('VERSION')
 
