@@ -66,8 +66,9 @@ class CLItest(unittest.TestCase):
         self.assertIn('boto_region', args)
         self.assertIn('boto_log_level', args)
 
+    @patch('krux_boto.cli.Application.run')
     @patch('krux_boto.cli.krux.cli.sys.exit')
-    def test_main(self, mock_exit):
+    def test_main(self, mock_exit, mock_run):
         """
         Main method runs correctly
         """
@@ -81,18 +82,8 @@ class CLItest(unittest.TestCase):
         ):
             main()
 
-        # Verify the current region and all regions are logged as warning
-        warn_calls = []
-        warn_calls.append(call('Getting regions via boto2'))
-
-        for region in RegionCode.Region:
-            warn_calls.append(call('Region: %s - %s', RegionCode[region].name, str(region)))
-
-        warn_calls.append(call('Getting regions via boto3'))
-
-        for region in RegionCode.Region:
-            warn_calls.append(call('Region: %s - %s', RegionCode[region].name, str(region)))
-
+        # Verify the mock Application.run method is called
+        mock_run.assert_called_once()
         # Verify the mock sys.exit has been called
         mock_exit.assert_called_once_with(0)
 
