@@ -8,6 +8,8 @@
 #
 
 from __future__ import absolute_import
+from os import path
+import json
 
 #
 # Third party libraries
@@ -21,16 +23,19 @@ import krux.cli
 from krux_boto.boto import add_boto_cli_arguments, get_boto, get_boto3, NAME
 from krux_boto.util import RegionCode
 
-from krux_boto.version import VERSION
-
 
 class Application(krux.cli.Application):
-    # XXX: Usually, a VERSION constant should be set in __init__.py and be imported.
-    #      However, krux-boto adds some basic classes to __init__.py and importing VERSION constant here
-    #      causes a dependency circle. Thus, set VERSION constant in version.py and import it
-    _VERSION = VERSION
 
     def __init__(self, name=NAME, *args, **kwargs):
+        # Usually, a VERSION constant should be set in __init__.py and be imported.
+        # However, krux-boto adds some basic classes to __init__.py and importing VERSION constant here
+        # causes a dependency circle. Thus, set VERSION constant in version.json and import it.
+        # path.dirname() gives current file's parent dir, calling twice would give us the correct path to version.json
+        # under the root folder.
+        _VERSION_PATH = path.join(path.dirname(path.dirname(__file__)), 'version.json')
+        with open(_VERSION_PATH, 'r') as f:
+            self._VERSION = json.load(f).get('VERSION')
+
         self._VERSIONS[NAME] = self._VERSION
 
         # Call to the superclass to bootstrap.

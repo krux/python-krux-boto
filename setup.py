@@ -12,19 +12,19 @@ Package setup for krux-boto
 #
 from __future__ import absolute_import
 from setuptools import setup, find_packages
+from os import path
+import json
 
-#
-# Internal libraries
-#
-# We use the version to construct the DOWNLOAD_URL.
-from krux_boto.version import VERSION
+# To avoid the dependency cycle, read version from a non-py file version.json.
+_VERSION_PATH = path.join(path.dirname(__file__), 'version.json')
+with open(_VERSION_PATH, 'r') as f:
+    VERSION = json.load(f).get('VERSION')
 
 # URL to the repository on Github.
 REPO_URL = 'https://github.com/krux/python-krux-boto'
 # Github will generate a tarball as long as you tag your releases, so don't
 # forget to tag!
 DOWNLOAD_URL = ''.join((REPO_URL, '/tarball/release/', VERSION))
-
 
 setup(
     name='krux-boto',
@@ -38,6 +38,9 @@ setup(
     download_url=DOWNLOAD_URL,
     license='All Rights Reserved.',
     packages=find_packages(),
+    package_data={
+        '': ['../version.json']
+    },
     install_requires=[
         'krux-stdlib',
         'boto',
