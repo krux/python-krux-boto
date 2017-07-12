@@ -46,7 +46,7 @@ from krux_boto.util import RegionCode
 # Constants
 ACCESS_KEY = 'AWS_ACCESS_KEY_ID'
 SECRET_KEY = 'AWS_SECRET_ACCESS_KEY'
-REGION = 'AWS_REGION'
+REGION = 'AWS_DEFAULT_REGION'
 NAME = 'krux-boto'
 
 # Defaults
