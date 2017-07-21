@@ -54,13 +54,15 @@ __DEFAULT_REGION = 'us-east-1'
 
 # Defaults
 # GOTCHA: If this is a simple string-to-string dictionary, values are evaluated on compilation.
-# This may cause some serious hair pulling if the developer decides to change the environment variable and expect
-# krux-boto to pick it up. Thus, make this a string-to-function dictionary so the values are evaluated on method call
-# and get up-to-date value.
+#         This may cause some serious hair pulling if the developer decides to change the environment variable
+#         and expect krux-boto to pick it up. Thus, make this a string-to-function dictionary
+#         so the values are evaluated on method call and get up-to-date value.
 DEFAULT = {
     'log_level': lambda: DEFAULT_LOG_LEVEL,
     'access_key': lambda: os.environ.get(ACCESS_KEY),
     'secret_key': lambda: os.environ.get(SECRET_KEY),
+    # GOTCHA: Unlike credentials, this is defaulted to environment variable, but not required. Create a default
+    #         fall-back value.
     'region': lambda: os.environ.get(REGION, __DEFAULT_REGION),
 }
 
