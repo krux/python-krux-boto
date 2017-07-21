@@ -10,7 +10,7 @@
 from __future__ import absolute_import
 import unittest
 from logging import Logger
-from os import path
+from os import path, environ
 import sys
 import json
 
@@ -25,11 +25,11 @@ from mock import MagicMock, patch, call
 # Internal libraries
 #
 
+from krux.logging import DEFAULT_LOG_LEVEL
 from krux.stats import DummyStatsClient
 from krux_boto.boto import Boto, Boto3, NAME
 from krux_boto.cli import Application, main
 from krux.cli import get_group
-from krux_boto.util import RegionCode
 
 
 class CLItest(unittest.TestCase):
@@ -62,16 +62,20 @@ class CLItest(unittest.TestCase):
 
     def test_add_cli_arguments(self):
         """
-        All the necessary arguments for krux_boto are added
+        All the necessary arguments for krux_boto are added and default values properly configured
         """
         self.app = Application()
 
         args = vars(self.app.args)
 
         self.assertIn('boto_access_key', args)
+        self.assertEqual(environ.get('AWS_ACCESS_KEY_ID'), args['boto_access_key'])
         self.assertIn('boto_secret_key', args)
+        self.assertEqual(environ.get('AWS_SECRET_ACCESS_KEY'), args['boto_secret_key'])
         self.assertIn('boto_region', args)
+        self.assertEqual(environ.get('AWS_DEFAULT_REGION', 'us-east-1'), args['boto_region'])
         self.assertIn('boto_log_level', args)
+        self.assertEqual(DEFAULT_LOG_LEVEL, args['boto_log_level'])
 
     @patch('krux_boto.cli.Application.run')
     @patch('krux_boto.cli.krux.cli.sys.exit')
