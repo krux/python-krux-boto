@@ -49,6 +49,9 @@ SECRET_KEY = 'AWS_SECRET_ACCESS_KEY'
 REGION = 'AWS_DEFAULT_REGION'
 NAME = 'krux-boto'
 
+# GOTCHA: This is not meant to be imported by another library. Thus, prefix with double underscore.
+__DEFAULT_REGION = 'us-east-1'
+
 # Defaults
 # GOTCHA: If this is a simple string-to-string dictionary, values are evaluated on compilation.
 # This may cause some serious hair pulling if the developer decides to change the environment variable and expect
@@ -58,7 +61,7 @@ DEFAULT = {
     'log_level': lambda: DEFAULT_LOG_LEVEL,
     'access_key': lambda: os.environ.get(ACCESS_KEY),
     'secret_key': lambda: os.environ.get(SECRET_KEY),
-    'region': lambda: os.environ.get(REGION),
+    'region': lambda: os.environ.get(REGION, __DEFAULT_REGION),
 }
 
 
@@ -200,12 +203,14 @@ class BaseBoto(object):
 
         if region is None:
             region = DEFAULT['region']()
-            if region is None:
-                self._logger.warn("There is not a default region set in your environment variables. Defaulted to 'us-east-1'")
-                region = 'us-east-1'
 
-        # GOTCHA: Due to backward incompatible version change in v1.0.0, the users of krux_boto may pass wrong credential
-        # Make sure the passed credential via CLI is the same as one passed into this instance
+        if REGION not in os.environ:
+            self._logger.warn(
+                "There is not a default region set in your environment variables. Defaulted to 'us-east-1'"
+            )
+
+        # GOTCHA: Due to backward incompatible version change in v1.0.0, the users of krux_boto may
+        # pass wrong credential. Make sure the passed credential via CLI is the same as one passed into this instance.
         parser = get_parser()
         add_boto_cli_arguments(parser)
         # GOTCHA: We only care about the credential arguments and nothing else.
