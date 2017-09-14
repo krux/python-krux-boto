@@ -2,11 +2,11 @@
 --extra-index-url https://staticfiles.krxd.net/foss/pypi/
 
 # Krux' standard library, which this is built on
-krux-stdlib==2.5.1
+krux-stdlib==2.5.2
 
 # The library this is wrapping
-boto==2.42.0
-boto3==1.4.0
+boto==2.48.0
+boto3==1.4.7
 
 # For RegionCode enum
 enum34==1.1.6
@@ -43,8 +43,8 @@ gitdb==0.6.4
 smmap==0.9.0
 
 # From boto3
-botocore==1.4.58
-futures==3.0.5
-jmespath==0.9.0
-python-dateutil==2.5.3
-s3transfer==0.1.5
+botocore==1.7.10
+futures==3.1.1
+jmespath==0.9.3
+python-dateutil==2.6.1
+s3transfer==0.1.11

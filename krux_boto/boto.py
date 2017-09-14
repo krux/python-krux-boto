@@ -144,35 +144,40 @@ def get_boto3(args=None, logger=None, stats=None):
 
 
 # Designed to be called from krux.cli, or programs inheriting from it
-def add_boto_cli_arguments(parser):
+def add_boto_cli_arguments(parser, include_log_level=True, include_credentials=True, include_region=True):
 
     group = get_group(parser, 'boto')
 
-    group.add_argument(
-        '--boto-log-level',
-        default=DEFAULT['log_level'](),
-        choices=LEVELS.keys(),
-        help='Verbosity of boto logging. (default: %(default)s)'
-    )
+    if include_log_level:
+        group.add_argument(
+            '--boto-log-level',
+            default=DEFAULT['log_level'](),
+            choices=LEVELS.keys(),
+            help="Verbosity of boto logging. (default: %(default)s)",
+        )
 
-    group.add_argument(
-        '--boto-access-key',
-        default=DEFAULT['access_key'](),
-        help='AWS Access Key to use. Defaults to ENV[{0}]'.format(ACCESS_KEY)
-    )
+    if include_credentials:
+        group.add_argument(
+            '--boto-access-key',
+            default=DEFAULT['access_key'](),
+            help="AWS Access Key to use. Defaults to ENV[{0}]".format(ACCESS_KEY),
+        )
 
-    group.add_argument(
-        '--boto-secret-key',
-        default=DEFAULT['secret_key'](),
-        help='AWS Secret Key to use. Defaults to ENV[{0}]'.format(SECRET_KEY),
-    )
+        group.add_argument(
+            '--boto-secret-key',
+            default=DEFAULT['secret_key'](),
+            help="AWS Secret Key to use. Defaults to ENV[{0}]".format(SECRET_KEY),
+        )
 
-    group.add_argument(
-        '--boto-region',
-        default=DEFAULT['region'](),
-        choices=[r.name for r in boto.ec2.regions()],
-        help='EC2 Region to connect to. Defaults to ENV[{0}]. If not ENV set, defaults to us-east-1.'.format(REGION),
-    )
+    if include_region:
+        group.add_argument(
+            '--boto-region',
+            default=DEFAULT['region'](),
+            choices=[r.name for r in boto.ec2.regions()],
+            help=(
+                "EC2 Region to connect to. Defaults to ENV[{0}]. If not ENV set, defaults to us-east-1.".format(REGION)
+            ),
+        )
 
 
 class BaseBoto(object):
