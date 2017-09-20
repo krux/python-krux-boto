@@ -67,17 +67,20 @@ DEFAULT = {
 }
 
 
-def get_boto(args=None, logger=None, stats=None):
+def __get_arguments(args=None, logger=None, stats=None):
     """
-    Return a usable Boto object without creating a class around it.
+    A helper method that generates a dictionary of arguments needed to instantiate a BaseBoto object.
+    The purpose of this method is to abstract out the code to handle optional CLI arguments
+    and not duplicate the None handling code.
 
-    In the context of a krux.cli (or similar) interface the 'args', 'logger'
-    and 'stats' objects should already be present. If you don't have them,
-    however, we'll attempt to provide usable ones for the boto setup.
-
-    (If you omit the add_boto_cli_arguments() call during other cli setup,
-    the Boto object will still work, but its cli options won't show up in
-    --help output)
+    :param args: Namespace of arguments parsed by argparse
+    :type args: argparse.Namespace
+    :param logger: Logger, recommended to be obtained using krux.cli.Application
+    :type logger: logging.Logger
+    :param stats: Stats, recommended to be obtained using krux.cli.Application
+    :type stats: kruxstatsd.StatsClient
+    :return: A dictionary of arguments needed for BaseBoto.__init__()
+    :rtype: dict
     """
 
     if not args:
@@ -95,14 +98,38 @@ def get_boto(args=None, logger=None, stats=None):
     if not stats:
         stats = get_stats(prefix=NAME)
 
-    return Boto(
-        log_level=args.boto_log_level,
-        access_key=args.boto_access_key,
-        secret_key=args.boto_secret_key,
-        region=args.boto_region,
-        logger=logger,
-        stats=stats,
-    )
+    return {
+        'log_level': getattr(args, 'boto_log_level', DEFAULT['log_level']()),
+        'access_key': getattr(args, 'boto_access_key', DEFAULT['access_key']()),
+        'secret_key': getattr(args, 'boto_secret_key', DEFAULT['secret_key']()),
+        'region': getattr(args, 'boto_region', DEFAULT['region']()),
+        'logger': logger,
+        'stats': stats,
+    }
+
+
+def get_boto(args=None, logger=None, stats=None):
+    """
+    Return a usable Boto object without creating a class around it.
+
+    In the context of a krux.cli (or similar) interface the 'args', 'logger'
+    and 'stats' objects should already be present. If you don't have them,
+    however, we'll attempt to provide usable ones for the boto setup.
+
+    (If you omit the add_boto_cli_arguments() call during other cli setup,
+    the Boto object will still work, but its cli options won't show up in
+    --help output)
+
+    :param args: Namespace of arguments parsed by argparse
+    :type args: argparse.Namespace
+    :param logger: Logger, recommended to be obtained using krux.cli.Application
+    :type logger: logging.Logger
+    :param stats: Stats, recommended to be obtained using krux.cli.Application
+    :type stats: kruxstatsd.StatsClient
+    :return: Boto object created with the arguments, logger, and stats created or deduced
+    :rtype: krux_boto.boto.Boto
+    """
+    return Boto(**__get_arguments(args, logger, stats))
 
 
 def get_boto3(args=None, logger=None, stats=None):
@@ -116,31 +143,17 @@ def get_boto3(args=None, logger=None, stats=None):
     (If you omit the add_boto_cli_arguments() call during other cli setup,
     the Boto object will still work, but its cli options won't show up in
     --help output)
+
+    :param args: Namespace of arguments parsed by argparse
+    :type args: argparse.Namespace
+    :param logger: Logger, recommended to be obtained using krux.cli.Application
+    :type logger: logging.Logger
+    :param stats: Stats, recommended to be obtained using krux.cli.Application
+    :type stats: kruxstatsd.StatsClient
+    :return: Boto3 object created with the arguments, logger, and stats created or deduced
+    :rtype: krux_boto.boto.Boto3
     """
-
-    if not args:
-        parser = get_parser()
-        add_boto_cli_arguments(parser)
-        # Parse only the known arguments added by add_boto_cli_arguments().
-        # We only need those arguments to create Boto object, nothing else.
-        # parse_known_args() return (Namespace, list of unknown arguments),
-        # we only care about the Namespace object here.
-        args = parser.parse_known_args()[0]
-
-    if not logger:
-        logger = get_logger(name=NAME)
-
-    if not stats:
-        stats = get_stats(prefix=NAME)
-
-    return Boto3(
-        log_level=args.boto_log_level,
-        access_key=args.boto_access_key,
-        secret_key=args.boto_secret_key,
-        region=args.boto_region,
-        logger=logger,
-        stats=stats,
-    )
+    return Boto3(**__get_arguments(args, logger, stats))
 
 
 # Designed to be called from krux.cli, or programs inheriting from it

@@ -27,7 +27,9 @@ from six import iteritems
 import krux_boto.boto
 import krux.cli
 import krux.logging
-from krux_boto.boto import Boto, Boto3, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY, REGION, get_boto, get_boto3
+from krux_boto.boto import (
+    Boto, Boto3, add_boto_cli_arguments, ACCESS_KEY, SECRET_KEY, REGION, get_boto, get_boto3, DEFAULT
+)
 
 
 class GetBotoTest(unittest.TestCase):
@@ -59,7 +61,7 @@ class GetBotoTest(unittest.TestCase):
     @patch('krux_boto.boto.Boto')
     def test_get_boto_with_args(self, mock_boto):
         """
-        get_boto correctly passes the arguments to Boto contructor
+        get_boto() correctly passes the arguments to Boto contructor
         """
         get_boto(self.args, self.logger, self.stats)
 
@@ -78,7 +80,7 @@ class GetBotoTest(unittest.TestCase):
     @patch('krux_boto.boto.get_stats')
     def test_get_boto_without_args(self, mock_get_stats, mock_get_logger, mock_boto):
         """
-        get_boto correctly parses the CLI arguments and pass them to Boto contructor
+        get_boto() correctly parses the CLI arguments and pass them to Boto contructor
         """
         mock_get_stats.return_value = self.stats
         mock_get_logger.return_value = self.logger
@@ -97,7 +99,7 @@ class GetBotoTest(unittest.TestCase):
     @patch('krux_boto.boto.Boto3')
     def test_get_boto3_with_args(self, mock_boto3):
         """
-        get_boto3 correctly passes the arguments to Boto3 contructor
+        get_boto3() correctly passes the arguments to Boto3 contructor
         """
         get_boto3(self.args, self.logger, self.stats)
 
@@ -116,7 +118,7 @@ class GetBotoTest(unittest.TestCase):
     @patch('krux_boto.boto.get_stats')
     def test_get_boto3_without_args(self, mock_get_stats, mock_get_logger, mock_boto3):
         """
-        get_boto3 correctly parses the CLI arguments and pass them to Boto3 contructor
+        get_boto3() correctly parses the CLI arguments and pass them to Boto3 contructor
         """
         mock_get_stats.return_value = self.stats
         mock_get_logger.return_value = self.logger
@@ -128,6 +130,54 @@ class GetBotoTest(unittest.TestCase):
             access_key=self.args.boto_access_key,
             secret_key=self.args.boto_secret_key,
             region=self.args.boto_region,
+            logger=self.logger,
+            stats=self.stats,
+        )
+
+    @patch('krux_boto.boto.Boto')
+    def test_get_boto_no_args(self, mock_boto):
+        """
+        get_boto() correctly handles when CLI arguments are not present
+        """
+        args = MagicMock(spec=[''])
+        environ = {
+            REGION: self.FAKE_REGION,
+            ACCESS_KEY: self.FAKE_ACCESS_KEY,
+            SECRET_KEY: self.FAKE_SECRET_KEY,
+        }
+
+        with patch.dict('krux_boto.boto.os.environ', environ):
+            get_boto(args=args, logger=self.logger, stats=self.stats)
+
+        mock_boto.assert_called_once_with(
+            log_level=DEFAULT['log_level'](),
+            access_key=self.FAKE_ACCESS_KEY,
+            secret_key=self.FAKE_SECRET_KEY,
+            region=self.FAKE_REGION,
+            logger=self.logger,
+            stats=self.stats,
+        )
+
+    @patch('krux_boto.boto.Boto3')
+    def test_get_boto3_no_args(self, mock_boto3):
+        """
+        get_boto3() correctly handles when CLI arguments are not present
+        """
+        args = MagicMock(spec=[''])
+        environ = {
+            REGION: self.FAKE_REGION,
+            ACCESS_KEY: self.FAKE_ACCESS_KEY,
+            SECRET_KEY: self.FAKE_SECRET_KEY,
+        }
+
+        with patch.dict('krux_boto.boto.os.environ', environ):
+            get_boto3(args=args, logger=self.logger, stats=self.stats)
+
+        mock_boto3.assert_called_once_with(
+            log_level=DEFAULT['log_level'](),
+            access_key=self.FAKE_ACCESS_KEY,
+            secret_key=self.FAKE_SECRET_KEY,
+            region=self.FAKE_REGION,
             logger=self.logger,
             stats=self.stats,
         )
