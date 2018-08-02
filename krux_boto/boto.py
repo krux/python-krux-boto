@@ -294,7 +294,7 @@ class BaseBoto(object):
             # $ FOO= ./myprog.py
             # It'll return an empty string, and we'd not catch it.
             if not os.environ.get(env_var, None):
-                self._logger.info(
+                self._logger.debug(
                     'Boto environment credential %s NOT explicitly set ' +
                     '-- boto will look for a .boto file somewhere', env_var
                 )

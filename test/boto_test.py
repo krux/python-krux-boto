@@ -316,7 +316,7 @@ class BotoTest(unittest.TestCase):
         for key, val in iteritems(credential_map):
             mock_logger.debug.assert_any_call('Passed boto credentials is empty. Falling back to environment variable %s', key)
             self.assertTrue(('Setting boto credential %s to %s', key, '<empty>') not in mock_logger.debug.call_args_list)
-            mock_logger.info.assert_any_call(
+            mock_logger.debug.assert_any_call(
                 'Boto environment credential %s NOT explicitly set -- boto will look for a .boto file somewhere',
                 key,
             )
