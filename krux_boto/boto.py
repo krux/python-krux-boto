@@ -225,8 +225,8 @@ class BaseBoto(object):
             region = DEFAULT['region']()
 
         if REGION not in os.environ:
-            self._logger.warn(
-                "There is not a default region set in your environment variables. Defaulted to 'us-east-1'"
+            self._logger.debug(
+                "There is not a default region set in your environment variables. Defaulted to '%s'", region
             )
 
         # GOTCHA: Due to backward incompatible version change in v1.0.0, the users of krux_boto may
