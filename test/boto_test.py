@@ -195,11 +195,6 @@ class BotoTest(unittest.TestCase):
                 logger=mock_logger,
             )
 
-            # User should be warned if the environment variable is not set.
-            mock_logger.warn.assert_called_once_with(
-                "There is not a default region set in your environment variables. Defaulted to 'us-east-1'"
-            )
-
             # Check that the region has correct default
             self.assertEqual(self.boto.cli_region, 'us-east-1')
 
@@ -214,11 +209,6 @@ class BotoTest(unittest.TestCase):
             self.boto = Boto(
                 logger=mock_logger,
                 region=region,
-            )
-
-            # User should be warned if the environment variable is not set.
-            mock_logger.warn.assert_called_once_with(
-                "There is not a default region set in your environment variables. Defaulted to 'us-east-1'"
             )
 
             # Check region can be set with command line argument with no environment variables
