@@ -1,15 +1,16 @@
 # Krux' standard library, which this is built on
-krux-stdlib==3.1.0
+krux-stdlib==3.2.0
 
 # The library this is wrapping
 boto==2.49.0
 boto3==1.9.150
+botocore==1.12.150
 
 # For RegionCode enum
 enum34==1.1.6
 
 # For Python 3 compatibility
-six==1.12.0
+six==1.12.0; python_version > '3.0'
 
 # Transitive libraries
 # This is needed so there are no version conflicts when
@@ -19,10 +20,10 @@ six==1.12.0
 # From krux-stdlib
 pystache==0.5.4
 Sphinx==1.8.5
-kruxstatsd==0.3.6
+kruxstatsd==0.4.0
 argparse==1.4.0; python_version > '3.0'
 tornado==5.1.1
-simplejson==3.8.2
+simplejson==3.16.0
 GitPython==2.1.11
 lockfile==0.12.2
 subprocess32==3.5.4
@@ -30,17 +31,16 @@ Jinja2==2.10.1
 MarkupSafe==1.1.1
 Pygments==2.4.2
 alabaster==0.7.12
-babel==2.6.0
+babel==2.7.0
 docutils==0.14
 imagesize==1.1.0
 pytz==2019.1
 snowballstemmer==1.2.1
-statsd==3.2.1
+statsd==3.3.0
 gitdb==0.6.4
 smmap==0.9.0
 
 # From boto3
-botocore==1.12.150
 futures==3.2.0; python_version <= '2.7'
 jmespath==0.9.4
 python-dateutil==2.8.0
