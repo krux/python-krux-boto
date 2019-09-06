@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# © 2014 Krux Digital, Inc.
+# © 2014-2019 Salesforce.com
 #
 
 """
@@ -59,4 +59,5 @@ setup(
         ],
     },
     test_suite='test',
+    python_requires='>=2.7, <4',
 )
