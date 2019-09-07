@@ -7,7 +7,7 @@
 # Standard libraries
 #
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division, print_function
 import string
 from collections import Mapping
 
@@ -40,7 +40,7 @@ def get_instance_region():
     if zone is None:
         get_logger('krux_boto').warn('get_instance_region failed to get the local instance region')
         raise Error('get_instance_region failed to get the local instance region')
-    return zone.rstrip(string.lowercase)
+    return zone.rstrip(string.ascii_lowercase)
 
 def setup_hosts(hosts, accepted_domains, default):
     """
