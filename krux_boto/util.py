@@ -8,6 +8,7 @@
 #
 
 from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import range
 import string
 from collections import Mapping
 
@@ -17,7 +18,7 @@ from collections import Mapping
 
 import boto.utils
 from enum import Enum
-from six import iteritems
+from six import iteritems, string_types
 
 #
 # Internal libraries
@@ -134,7 +135,7 @@ class __RegionCode(Mapping):
     def __getitem__(self, key):
         if isinstance(key, self.Region) or isinstance(key, self.Code):
             return self._wrapped[key]
-        elif isinstance(key, str):
+        elif isinstance(key, string_types):
             key = key.replace('-', '_')
 
             code = getattr(self.Code, key.upper(), None)

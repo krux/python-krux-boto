@@ -8,6 +8,7 @@
 #
 
 from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import str
 import unittest
 from logging import Logger
 
@@ -209,7 +210,7 @@ class RegionCodeTest(unittest.TestCase):
         """
         Given an invalid key, RegionCode throws error
         """
-        fake_key = 'foobar'
+        fake_key = str(u'foobar')
         with self.assertRaises(KeyError) as e:
             RegionCode[fake_key]
 
