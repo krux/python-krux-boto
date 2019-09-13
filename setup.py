@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# © 2014 Krux Digital, Inc.
+# © 2014-2019 Salesforce.com
 #
 
 """
@@ -10,7 +10,7 @@ Package setup for krux-boto
 #
 # Standard libraries
 #
-from __future__ import absolute_import
+from __future__ import absolute_import, division, print_function
 from setuptools import setup, find_packages
 from os import path
 import json
@@ -59,4 +59,5 @@ setup(
         ],
     },
     test_suite='test',
+    python_requires='>=2.7, <4',
 )

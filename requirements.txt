@@ -1,70 +1,8 @@
-# Krux' python repo
+--index-url https://pypi.org/simple
 --extra-index-url https://staticfiles.krxd.net/foss/pypi/
-
-# Krux' standard library, which this is built on
-krux-stdlib==2.5.2
-
-# The library this is wrapping
-boto==2.48.0
-boto3==1.4.7
-
-# For RegionCode enum
+--requirement upstream-requirements.txt
+boto==2.49.0
+boto3==1.9.224
 enum34==1.1.6
-
-# For Python 3 compabitility
-six==1.10.0
-
-# Transitive libraries
-# This is needed so there are no version conflicts when
-# one downstream library does NOT specify the version it wants,
-# and another one does.
-
-# From krux-stdlib
-alabaster==0.7.12
-Babel==2.7.0
-backports-abc==0.5
-boto==2.48.0
-boto3==1.4.7
-botocore==1.7.48
-certifi==2019.6.16
-chardet==3.0.4
-docutils==0.14
-enum34==1.1.6
-futures==3.2.0
-gitdb2==2.0.5
-GitPython==2.1.11
-idna==2.8
-imagesize==1.1.0
-Jinja2==2.10.1
-jmespath==0.9.4
-krux-stdlib==2.5.2
-kruxstatsd==0.3.6
-lockfile==0.12.2
-MarkupSafe==1.1.1
-packaging==19.0
-Pygments==2.4.2
-pyparsing==2.4.0
-pystache==0.5.4
-python-dateutil==2.8.0
-pytz==2019.1
-requests==2.22.0
-s3transfer==0.1.13
-simplejson==3.16.0
-singledispatch==3.4.0.3
-six==1.10.0
-smmap2==2.0.5
-snowballstemmer==1.2.1
-Sphinx==1.8.5
-sphinxcontrib-websupport==1.1.2
-statsd==3.3.0
-subprocess32==3.5.4
-tornado==5.1.1
-typing==3.7.4
-urllib3==1.25.3
-
-
-# From boto3
-botocore==1.7.48
-jmespath==0.9.4
-python-dateutil==2.8.0
-s3transfer==0.1.13
+krux-stdlib==4.0.0
+six==1.12.0

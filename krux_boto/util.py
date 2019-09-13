@@ -7,7 +7,8 @@
 # Standard libraries
 #
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division, print_function
+from builtins import range
 import string
 from collections import Mapping
 
@@ -17,7 +18,7 @@ from collections import Mapping
 
 import boto.utils
 from enum import Enum
-from six import iteritems
+from six import iteritems, string_types
 
 #
 # Internal libraries
@@ -40,7 +41,7 @@ def get_instance_region():
     if zone is None:
         get_logger('krux_boto').warn('get_instance_region failed to get the local instance region')
         raise Error('get_instance_region failed to get the local instance region')
-    return zone.rstrip(string.lowercase)
+    return zone.rstrip(string.ascii_lowercase)
 
 def setup_hosts(hosts, accepted_domains, default):
     """
@@ -134,7 +135,7 @@ class __RegionCode(Mapping):
     def __getitem__(self, key):
         if isinstance(key, self.Region) or isinstance(key, self.Code):
             return self._wrapped[key]
-        elif isinstance(key, str):
+        elif isinstance(key, string_types):
             key = key.replace('-', '_')
 
             code = getattr(self.Code, key.upper(), None)

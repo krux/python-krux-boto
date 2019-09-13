@@ -7,7 +7,8 @@
 # Standard libraries
 #
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division, print_function
+from builtins import object
 from functools import wraps
 
 # Declare the baseboto class a metaclass to avoid
@@ -41,6 +42,7 @@ from krux.logging import get_logger, LEVELS, DEFAULT_LOG_LEVEL
 from krux.stats import get_stats
 from krux.cli import get_parser, get_group
 from krux_boto.util import RegionCode
+from future.utils import with_metaclass
 
 
 # Constants
@@ -165,7 +167,7 @@ def add_boto_cli_arguments(parser, include_log_level=True, include_credentials=T
         group.add_argument(
             '--boto-log-level',
             default=DEFAULT['log_level'](),
-            choices=LEVELS.keys(),
+            choices=list(LEVELS.keys()),
             help="Verbosity of boto logging. (default: %(default)s)",
         )
 
@@ -193,11 +195,9 @@ def add_boto_cli_arguments(parser, include_log_level=True, include_credentials=T
         )
 
 
-class BaseBoto(object):
+class BaseBoto(with_metaclass(ABCMeta, object)):
     # This is an abstract class, which prevents direct instantiation. See here
     # for details: https://docs.python.org/2/library/abc.html
-    __metaclass__ = ABCMeta
-
     def __init__(
         self,
         log_level=None,
