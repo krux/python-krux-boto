@@ -272,8 +272,7 @@ class BotoTest(unittest.TestCase):
                 ('Passed boto credentials is empty. Falling back to environment variable %s', key)
                 not in mock_logger.debug.call_args_list
             )
-            obsc = val[0:3] + '[...]' + val[-3:]
-            mock_logger.debug.assert_any_call('Setting boto credential %s to %s', key, obsc)
+            mock_logger.debug.assert_any_call('Setting boto credential %s', key)
             self.assertTrue(
                 ('Boto environment credential %s NOT explicitly set -- boto will look for a .boto file somewhere', key)
                 not in mock_logger.info.call_args_list
@@ -358,14 +357,11 @@ class BotoTest(unittest.TestCase):
                     logger=mock_logger
                 )
 
-        for key, value in iteritems(credential_map):
-            msg = 'You set %s as {0} in CLI, but passed %s to the library. ' \
+        for item in ('access-key', 'secret-key'):
+            msg = 'You set a different boto-%s in CLI. ' \
                 'To avoid this error, consider using get_boto() function. ' \
-                'For more information, please check README.' \
-                .format(value['msg'])
-            cli_key = value['CLI'][0:3] + '[...]' + value['CLI'][-3:]
-            env_key = value['ENV'][0:3] + '[...]' + value['ENV'][-3:]
-            mock_logger.warn.assert_any_call(msg, cli_key, env_key)
+                'For more information, please check README.' % item
+            mock_logger.warn.assert_any_call(msg)
 
     def test_logging_level(self):
         """

@@ -240,17 +240,15 @@ class BaseBoto(with_metaclass(ABCMeta, object)):
         _secret_key = getattr(args, 'boto_secret_key', None)
         if _access_key is not None and _access_key != access_key:
             self._logger.warn(
-                'You set %s as boto-access-key in CLI, but passed %s to the library. '
+                'You set a different boto-access-key in CLI. '
                 'To avoid this error, consider using get_boto() function. '
-                'For more information, please check README.',
-                BaseBoto._hide_value(_access_key), BaseBoto._hide_value(access_key),
+                'For more information, please check README.'
             )
         if _secret_key is not None and _secret_key != secret_key:
             self._logger.warn(
-                'You set %s as boto-secret-key in CLI, but passed %s to the library. '
+                'You set a different boto-secret-key in CLI. '
                 'To avoid this error, consider using get_boto() function. '
-                'For more information, please check README.',
-                BaseBoto._hide_value(_secret_key), BaseBoto._hide_value(secret_key),
+                'For more information, please check README.'
             )
 
         # Infer the loglevel, but set it as a property so the subclasses can
@@ -282,7 +280,7 @@ class BaseBoto(with_metaclass(ABCMeta, object)):
 
                 # this way we can tell what credentials are being used,
                 # without dumping the whole secret into the logs
-                self._logger.debug('Setting boto credential %s to %s', env_var, BaseBoto._hide_value(val))
+                self._logger.debug('Setting boto credential %s', env_var)
 
                 os.environ[env_var] = val
 
@@ -298,10 +296,6 @@ class BaseBoto(with_metaclass(ABCMeta, object)):
                     'Boto environment credential %s NOT explicitly set ' +
                     '-- boto will look for a .boto file somewhere', env_var
                 )
-
-    @staticmethod
-    def _hide_value(value):
-        return value[0:3] + '[...]' + value[-3:]
 
     def __getattr__(self, attr):
         """Proxies calls to ``boto.*`` methods."""
