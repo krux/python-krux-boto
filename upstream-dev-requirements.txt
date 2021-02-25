@@ -1,2 +1,0 @@
-coverage==4.2
-funcsigs==1.0.2 ; python_version < '3.3'
