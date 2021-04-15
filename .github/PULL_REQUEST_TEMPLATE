@@ -31,7 +31,7 @@ _(encouraged) Insert an appropriate gif/meme to brighten up your reviewer's day.
 - [ ] The version of the package has been updated according to [Semantic Versioning](http://semver.org/).
 - [ ] The change has unit & integration tests as appropriate.
 - [ ] Documentation is up to date and correct.
-- [ ] Dependencies are correctly listed under `requirements.pip` and
+- [ ] Dependencies are correctly listed under `Pipfile`/`Pipfile.lock` and
       are up to date without going over a major version.
 - [ ] Stakeholders have been notified. Workflow-impacting changes have
       been appropriately socialized to avoid surprises.
