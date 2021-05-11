@@ -7,7 +7,6 @@
 # Standard libraries
 #
 
-from __future__ import absolute_import, division, print_function
 from builtins import range
 import string
 from collections import Mapping
@@ -18,7 +17,6 @@ from collections import Mapping
 
 import boto.utils
 from enum import Enum
-from six import iteritems, string_types
 
 #
 # Internal libraries
@@ -122,7 +120,7 @@ class __RegionCode(Mapping):
         #       However, since __getitem__() is merely a lookup of _member_map_ dictionary, duplicate the elements
         #       in the private dictionary so that we can handle AWS region <-> RegionCode.Region conversion smoothly.
         dash_dict = {}
-        for name, region in iteritems(self.Region._member_map_):
+        for name, region in self.Region._member_map_.items():
             dash_dict[name.lower().replace('_', '-')] = region
         self.Region._member_map_.update(dash_dict)
 
@@ -135,7 +133,7 @@ class __RegionCode(Mapping):
     def __getitem__(self, key):
         if isinstance(key, self.Region) or isinstance(key, self.Code):
             return self._wrapped[key]
-        elif isinstance(key, string_types):
+        elif isinstance(key, str):
             key = key.replace('-', '_')
 
             code = getattr(self.Code, key.upper(), None)
