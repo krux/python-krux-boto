@@ -10,7 +10,6 @@ Package setup for krux-boto
 #
 # Standard libraries
 #
-from __future__ import absolute_import, division, print_function
 from setuptools import setup, find_packages
 from os import path
 import json
@@ -59,5 +58,5 @@ setup(
         ],
     },
     test_suite='test',
-    python_requires='>=2.7, <4',
+    python_requires='>=3.6, <4',
 )
